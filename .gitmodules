@@ -1,0 +1,3 @@
+[submodule "randvardistribution"]
+	path = randvardistribution
+	url = https://github.com/AUXLander/randvardistribution.git

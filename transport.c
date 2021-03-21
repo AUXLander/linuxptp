@@ -26,8 +26,7 @@
 #include "udp6.h"
 #include "uds.h"
 
-#include "print.h"
-#include "msg.h"
+#include "timestamper.h"
 
 int transport_close(struct transport *t, struct fdarray *fda)
 {
@@ -48,50 +47,10 @@ int transport_recv(struct transport *t, int fd, struct ptp_message *msg)
 int transport_send(struct transport *t, struct fdarray *fda,
 		   enum transport_event event, struct ptp_message *msg)
 {
-	struct Timestamp* addr;
+	track(msg);
 
-	uint16_t seconds_msb;
-	uint32_t seconds_lsb;
-
-	switch (msg->header.tsmt)
-	{
-	case SYNC:
-		addr = &msg->sync.originTimestamp; // 6 bytes for secs
-		break;
-	case DELAY_REQ:
-		addr = &msg->delay_req.originTimestamp;
-		break;
-	case PDELAY_REQ:
-		addr = &msg->pdelay_req.originTimestamp;
-		break;
-	case PDELAY_RESP:
-		addr = &msg->pdelay_resp.requestReceiptTimestamp;
-		break;
-	case FOLLOW_UP:
-		addr = &msg->follow_up.preciseOriginTimestamp;
-		break;
-	case DELAY_RESP:
-		addr = &msg->delay_resp.receiveTimestamp;
-		break;
-	case PDELAY_RESP_FOLLOW_UP:
-		addr = &msg->pdelay_resp_fup.responseOriginTimestamp;
-		break;
-	case ANNOUNCE:
-		addr = &msg->announce.originTimestamp;
-		break;
-
-		default:
-		canmemcopy = false;
-	}
-
-	seconds_msb = ntohl(addr->seconds_msb);
-	seconds_lsb = ntohl(addr->seconds_lsb); // use
-	
-	pr_notice("TRANSPORT PEER: msb %lu lsb %lu", seconds_msb, seconds_lsb);
-
-	// little endian to bit endian
+	// little endian to big endian
 	int len = ntohs(msg->header.messageLength); // сетевой порядок расположения байтов положительного короткого целого netshort в узловой порядок расположения байтов.
-
 
 	return t->send(t, fda, event, 0, msg, len, NULL, &msg->hwts);
 }
@@ -99,46 +58,7 @@ int transport_send(struct transport *t, struct fdarray *fda,
 int transport_peer(struct transport *t, struct fdarray *fda,
 		   enum transport_event event, struct ptp_message *msg)
 {
-	struct Timestamp* addr;
-
-	uint16_t seconds_msb;
-	uint32_t seconds_lsb;
-
-	switch (msg->header.tsmt)
-	{
-	case SYNC:
-		addr = &msg->sync.originTimestamp; // 6 bytes for secs
-		break;
-	case DELAY_REQ:
-		addr = &msg->delay_req.originTimestamp;
-		break;
-	case PDELAY_REQ:
-		addr = &msg->pdelay_req.originTimestamp;
-		break;
-	case PDELAY_RESP:
-		addr = &msg->pdelay_resp.requestReceiptTimestamp;
-		break;
-	case FOLLOW_UP:
-		addr = &msg->follow_up.preciseOriginTimestamp;
-		break;
-	case DELAY_RESP:
-		addr = &msg->delay_resp.receiveTimestamp;
-		break;
-	case PDELAY_RESP_FOLLOW_UP:
-		addr = &msg->pdelay_resp_fup.responseOriginTimestamp;
-		break;
-	case ANNOUNCE:
-		addr = &msg->announce.originTimestamp;
-		break;
-
-		default:
-		canmemcopy = false;
-	}
-
-	seconds_msb = ntohl(addr->seconds_msb);
-	seconds_lsb = ntohl(addr->seconds_lsb); // use
-	
-	pr_notice("TRANSPORT PEER: msb %lu lsb %lu", seconds_msb, seconds_lsb);
+	track(msg);
 
 	int len = ntohs(msg->header.messageLength);
 
