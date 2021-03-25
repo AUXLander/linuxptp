@@ -1,0 +1,5 @@
+MASTER:
+sudo ptp4l -4 -S -P -i enp0s8 -m
+
+SLAVE:
+sudo ptp4l -P -4 -S -i enp0s8 -s -m
