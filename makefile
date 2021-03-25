@@ -18,14 +18,15 @@
 KBUILD_OUTPUT =
 
 DEBUG	=
-CC	= $(CROSS_COMPILE)gcc
+CC	= $(CROSS_COMPILE)clang
 VER     = -DVER=$(version)
-CFLAGS	= -Wall $(VER) $(incdefs) $(DEBUG) $(EXTRA_CFLAGS)
+CPPFLAGS = #-fpermissive #-std=gnu++2a 
+CFLAGS	= $(VER) $(incdefs) $(DEBUG) $(EXTRA_CFLAGS)
 LDLIBS	= -lm -lrt -pthread $(EXTRA_LDFLAGS)
 PRG	= ptp4l hwstamp_ctl nsm phc2sys phc_ctl pmc timemaster ts2phc
 FILTERS	= filter.o mave.o mmedian.o
 SERVOS	= linreg.o ntpshm.o nullf.o pi.o servo.o
-TRANSP	= raw.o transport.o udp.o udp6.o uds.o
+TRANSP	= raw.o transport.o timestamper.o udp.o udp6.o uds.o
 TS2PHC	= ts2phc.o lstab.o nmea.o serial.o sock.o ts2phc_generic_master.o \
  ts2phc_master.o ts2phc_phc_master.o ts2phc_nmea_master.o ts2phc_slave.o
 OBJ	= bmc.o clock.o clockadj.o clockcheck.o config.o designated_fsm.o \
@@ -92,6 +93,9 @@ clean:
 
 distclean: clean
 	rm -f .version
+	
+#precompile:
+#	g++-8 -S -c timestamper.c -o timestamper.o
 
 # Implicit rule to generate a C source file's dependencies.
 %.d: %.c
