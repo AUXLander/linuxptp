@@ -1,0 +1,1537 @@
+[
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:56.341142149 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719116.341142149",
+          "frame.time_delta": "0.000000000",
+          "frame.time_delta_displayed": "0.000000000",
+          "frame.time_relative": "0.000000000",
+          "frame.number": "1",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:d4:49:da",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_d4:49:da",
+            "eth.addr": "08:00:27:d4:49:da",
+            "eth.addr_resolved": "PcsCompu_d4:49:da",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000a509",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x0000336e",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.16",
+          "ip.addr": "192.168.0.16",
+          "ip.src_host": "192.168.0.16",
+          "ip.host": "192.168.0.16",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "319",
+          "udp.dstport": "319",
+          "udp.port": "319",
+          "udp.port": "319",
+          "udp.length": "62",
+          "udp.checksum": "0x0000a173",
+          "udp.checksum.status": "2",
+          "udp.stream": "0"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "2",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000000",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "0",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffed449da",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2050",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdrq.origintimestamp.seconds": "0",
+          "ptp.v2.pdrq.origintimestamp.nanoseconds": "0"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:56.341646963 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719116.341646963",
+          "frame.time_delta": "0.000504814",
+          "frame.time_delta_displayed": "0.000504814",
+          "frame.time_relative": "0.000504814",
+          "frame.number": "2",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:3f:25:35",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_3f:25:35",
+            "eth.addr": "08:00:27:3f:25:35",
+            "eth.addr_resolved": "PcsCompu_3f:25:35",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000c8ed",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x00000f89",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.17",
+          "ip.addr": "192.168.0.17",
+          "ip.src_host": "192.168.0.17",
+          "ip.host": "192.168.0.17",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "319",
+          "udp.dstport": "319",
+          "udp.port": "319",
+          "udp.port": "319",
+          "udp.length": "62",
+          "udp.checksum": "0x00008335",
+          "udp.checksum.status": "2",
+          "udp.stream": "1"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "3",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000200",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "1",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffe3f2535",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2050",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdrs.requestreceipttimestamp.seconds": "1615719116",
+          "ptp.v2.pdrs.requestreceipttimestamp.nanoseconds": "341350985",
+          "ptp.v2.pdrs.requestingportidentity": "0x080027fffed449da",
+          "ptp.v2.pdrs.requestingsourceportid": "1"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:56.341649319 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719116.341649319",
+          "frame.time_delta": "0.000002356",
+          "frame.time_delta_displayed": "0.000002356",
+          "frame.time_relative": "0.000507170",
+          "frame.number": "3",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:3f:25:35",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_3f:25:35",
+            "eth.addr": "08:00:27:3f:25:35",
+            "eth.addr_resolved": "PcsCompu_3f:25:35",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000c8ee",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x00000f88",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.17",
+          "ip.addr": "192.168.0.17",
+          "ip.src_host": "192.168.0.17",
+          "ip.host": "192.168.0.17",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "320",
+          "udp.dstport": "320",
+          "udp.port": "320",
+          "udp.port": "320",
+          "udp.length": "62",
+          "udp.checksum": "0x00004060",
+          "udp.checksum.status": "2",
+          "udp.stream": "2"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "10",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000000",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "0",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffe3f2535",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2050",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdfu.responseorigintimestamp.seconds": "1615719116",
+          "ptp.v2.pdfu.responseorigintimestamp.nanoseconds": "341432347",
+          "ptp.v2.pdfu.requestingportidentity": "0x080027fffed449da",
+          "ptp.v2.pdfu.requestingsourceportid": "1"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:56.341961182 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719116.341961182",
+          "frame.time_delta": "0.000311863",
+          "frame.time_delta_displayed": "0.000311863",
+          "frame.time_relative": "0.000819033",
+          "frame.number": "4",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:3f:25:35",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_3f:25:35",
+            "eth.addr": "08:00:27:3f:25:35",
+            "eth.addr_resolved": "PcsCompu_3f:25:35",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000c8ef",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x00000f87",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.17",
+          "ip.addr": "192.168.0.17",
+          "ip.src_host": "192.168.0.17",
+          "ip.host": "192.168.0.17",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "319",
+          "udp.dstport": "319",
+          "udp.port": "319",
+          "udp.port": "319",
+          "udp.length": "62",
+          "udp.checksum": "0x0000f893",
+          "udp.checksum.status": "2",
+          "udp.stream": "1"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "2",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000000",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "0",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffe3f2535",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2063",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdrq.origintimestamp.seconds": "0",
+          "ptp.v2.pdrq.origintimestamp.nanoseconds": "0"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:56.342091747 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719116.342091747",
+          "frame.time_delta": "0.000130565",
+          "frame.time_delta_displayed": "0.000130565",
+          "frame.time_relative": "0.000949598",
+          "frame.number": "5",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:d4:49:da",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_d4:49:da",
+            "eth.addr": "08:00:27:d4:49:da",
+            "eth.addr_resolved": "PcsCompu_d4:49:da",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000a50a",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x0000336d",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.16",
+          "ip.addr": "192.168.0.16",
+          "ip.src_host": "192.168.0.16",
+          "ip.host": "192.168.0.16",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "319",
+          "udp.dstport": "319",
+          "udp.port": "319",
+          "udp.port": "319",
+          "udp.length": "62",
+          "udp.checksum": "0x0000a173",
+          "udp.checksum.status": "2",
+          "udp.stream": "0"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "3",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000200",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "1",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffed449da",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2063",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdrs.requestreceipttimestamp.seconds": "1615719116",
+          "ptp.v2.pdrs.requestreceipttimestamp.nanoseconds": "341961182",
+          "ptp.v2.pdrs.requestingportidentity": "0x080027fffe3f2535",
+          "ptp.v2.pdrs.requestingsourceportid": "1"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:56.342130963 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719116.342130963",
+          "frame.time_delta": "0.000039216",
+          "frame.time_delta_displayed": "0.000039216",
+          "frame.time_relative": "0.000988814",
+          "frame.number": "6",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:d4:49:da",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_d4:49:da",
+            "eth.addr": "08:00:27:d4:49:da",
+            "eth.addr_resolved": "PcsCompu_d4:49:da",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000a50b",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x0000336c",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.16",
+          "ip.addr": "192.168.0.16",
+          "ip.src_host": "192.168.0.16",
+          "ip.host": "192.168.0.16",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "320",
+          "udp.dstport": "320",
+          "udp.port": "320",
+          "udp.port": "320",
+          "udp.length": "62",
+          "udp.checksum": "0x0000a173",
+          "udp.checksum.status": "2",
+          "udp.stream": "3"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "10",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000000",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "0",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffed449da",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2063",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdfu.responseorigintimestamp.seconds": "1615719116",
+          "ptp.v2.pdfu.responseorigintimestamp.nanoseconds": "342095868",
+          "ptp.v2.pdfu.requestingportidentity": "0x080027fffe3f2535",
+          "ptp.v2.pdfu.requestingsourceportid": "1"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:56.342214152 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719116.342214152",
+          "frame.time_delta": "0.000083189",
+          "frame.time_delta_displayed": "0.000083189",
+          "frame.time_relative": "0.001072003",
+          "frame.number": "7",
+          "frame.len": "86",
+          "frame.cap_len": "86",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:01:81",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_01:81",
+            "eth.addr": "01:00:5e:00:01:81",
+            "eth.addr_resolved": "IPv4mcast_01:81",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:3f:25:35",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_3f:25:35",
+            "eth.addr": "08:00:27:3f:25:35",
+            "eth.addr_resolved": "PcsCompu_3f:25:35",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "72",
+          "ip.id": "0x00009af0",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x00003c7a",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.17",
+          "ip.addr": "192.168.0.17",
+          "ip.src_host": "192.168.0.17",
+          "ip.host": "192.168.0.17",
+          "ip.dst": "224.0.1.129",
+          "ip.addr": "224.0.1.129",
+          "ip.dst_host": "224.0.1.129",
+          "ip.host": "224.0.1.129"
+        },
+        "udp": {
+          "udp.srcport": "319",
+          "udp.dstport": "319",
+          "udp.port": "319",
+          "udp.port": "319",
+          "udp.length": "52",
+          "udp.checksum": "0x0000fd20",
+          "udp.checksum.status": "2",
+          "udp.stream": "4"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "0",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "44",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000200",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "1",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffe3f2535",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2057",
+          "ptp.v2.control": "0",
+          "ptp.v2.logmessageperiod": "0",
+          "ptp.v2.sdr.origintimestamp.seconds": "0",
+          "ptp.v2.sdr.origintimestamp.nanoseconds": "0"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:56.342216922 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719116.342216922",
+          "frame.time_delta": "0.000002770",
+          "frame.time_delta_displayed": "0.000002770",
+          "frame.time_relative": "0.001074773",
+          "frame.number": "8",
+          "frame.len": "86",
+          "frame.cap_len": "86",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:01:81",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_01:81",
+            "eth.addr": "01:00:5e:00:01:81",
+            "eth.addr_resolved": "IPv4mcast_01:81",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:3f:25:35",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_3f:25:35",
+            "eth.addr": "08:00:27:3f:25:35",
+            "eth.addr_resolved": "PcsCompu_3f:25:35",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "72",
+          "ip.id": "0x00009af1",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x00003c79",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.17",
+          "ip.addr": "192.168.0.17",
+          "ip.src_host": "192.168.0.17",
+          "ip.host": "192.168.0.17",
+          "ip.dst": "224.0.1.129",
+          "ip.addr": "224.0.1.129",
+          "ip.dst_host": "224.0.1.129",
+          "ip.host": "224.0.1.129"
+        },
+        "udp": {
+          "udp.srcport": "320",
+          "udp.dstport": "320",
+          "udp.port": "320",
+          "udp.port": "320",
+          "udp.length": "52",
+          "udp.checksum": "0x0000cae0",
+          "udp.checksum.status": "2",
+          "udp.stream": "5"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "8",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "44",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000000",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "0",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffe3f2535",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2057",
+          "ptp.v2.control": "2",
+          "ptp.v2.logmessageperiod": "0",
+          "ptp.v2.fu.preciseorigintimestamp.seconds": "1615719116",
+          "ptp.v2.fu.preciseorigintimestamp.nanoseconds": "342018753"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:57.341253923 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719117.341253923",
+          "frame.time_delta": "0.999037001",
+          "frame.time_delta_displayed": "0.999037001",
+          "frame.time_relative": "1.000111774",
+          "frame.number": "9",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:d4:49:da",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_d4:49:da",
+            "eth.addr": "08:00:27:d4:49:da",
+            "eth.addr_resolved": "PcsCompu_d4:49:da",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000a5bf",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x000032b8",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.16",
+          "ip.addr": "192.168.0.16",
+          "ip.src_host": "192.168.0.16",
+          "ip.host": "192.168.0.16",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "319",
+          "udp.dstport": "319",
+          "udp.port": "319",
+          "udp.port": "319",
+          "udp.length": "62",
+          "udp.checksum": "0x0000a173",
+          "udp.checksum.status": "2",
+          "udp.stream": "0"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "2",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000000",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "0",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffed449da",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2051",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdrq.origintimestamp.seconds": "0",
+          "ptp.v2.pdrq.origintimestamp.nanoseconds": "0"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:57.341721818 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719117.341721818",
+          "frame.time_delta": "0.000467895",
+          "frame.time_delta_displayed": "0.000467895",
+          "frame.time_relative": "1.000579669",
+          "frame.number": "10",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:3f:25:35",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_3f:25:35",
+            "eth.addr": "08:00:27:3f:25:35",
+            "eth.addr_resolved": "PcsCompu_3f:25:35",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000c98f",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x00000ee7",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.17",
+          "ip.addr": "192.168.0.17",
+          "ip.src_host": "192.168.0.17",
+          "ip.host": "192.168.0.17",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "319",
+          "udp.dstport": "319",
+          "udp.port": "319",
+          "udp.port": "319",
+          "udp.length": "62",
+          "udp.checksum": "0x00002750",
+          "udp.checksum.status": "2",
+          "udp.stream": "1"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "3",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000200",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "1",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffe3f2535",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2051",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdrs.requestreceipttimestamp.seconds": "1615719117",
+          "ptp.v2.pdrs.requestreceipttimestamp.nanoseconds": "341505578",
+          "ptp.v2.pdrs.requestingportidentity": "0x080027fffed449da",
+          "ptp.v2.pdrs.requestingsourceportid": "1"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:57.341724088 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719117.341724088",
+          "frame.time_delta": "0.000002270",
+          "frame.time_delta_displayed": "0.000002270",
+          "frame.time_relative": "1.000581939",
+          "frame.number": "11",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:3f:25:35",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_3f:25:35",
+            "eth.addr": "08:00:27:3f:25:35",
+            "eth.addr_resolved": "PcsCompu_3f:25:35",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000c990",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x00000ee6",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.17",
+          "ip.addr": "192.168.0.17",
+          "ip.src_host": "192.168.0.17",
+          "ip.host": "192.168.0.17",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "320",
+          "udp.dstport": "320",
+          "udp.port": "320",
+          "udp.port": "320",
+          "udp.length": "62",
+          "udp.checksum": "0x0000c3a4",
+          "udp.checksum.status": "2",
+          "udp.stream": "2"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "10",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000000",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "0",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffe3f2535",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2051",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdfu.responseorigintimestamp.seconds": "1615719117",
+          "ptp.v2.pdfu.responseorigintimestamp.nanoseconds": "341595346",
+          "ptp.v2.pdfu.requestingportidentity": "0x080027fffed449da",
+          "ptp.v2.pdfu.requestingsourceportid": "1"
+        }
+      }
+    }
+  }
+
+  ,
+  {
+    "_index": "packets-2021-03-14",
+    "_type": "pcap_file",
+    "_score": null,
+    "_source": {
+      "layers": {
+        "frame": {
+          "frame.interface_id": "0",
+          "frame.interface_id_tree": {
+            "frame.interface_name": "enp0s3"
+          },
+          "frame.encap_type": "1",
+          "frame.time": "Mar 14, 2021 13:51:57.342022443 MSK",
+          "frame.offset_shift": "0.000000000",
+          "frame.time_epoch": "1615719117.342022443",
+          "frame.time_delta": "0.000298355",
+          "frame.time_delta_displayed": "0.000298355",
+          "frame.time_relative": "1.000880294",
+          "frame.number": "12",
+          "frame.len": "96",
+          "frame.cap_len": "96",
+          "frame.marked": "0",
+          "frame.ignored": "0",
+          "frame.protocols": "eth:ethertype:ip:udp:ptp",
+          "frame.coloring_rule.name": "UDP",
+          "frame.coloring_rule.string": "udp"
+        },
+        "eth": {
+          "eth.dst": "01:00:5e:00:00:6b",
+          "eth.dst_tree": {
+            "eth.dst_resolved": "IPv4mcast_6b",
+            "eth.addr": "01:00:5e:00:00:6b",
+            "eth.addr_resolved": "IPv4mcast_6b",
+            "eth.lg": "0",
+            "eth.ig": "1"
+          },
+          "eth.src": "08:00:27:3f:25:35",
+          "eth.src_tree": {
+            "eth.src_resolved": "PcsCompu_3f:25:35",
+            "eth.addr": "08:00:27:3f:25:35",
+            "eth.addr_resolved": "PcsCompu_3f:25:35",
+            "eth.lg": "0",
+            "eth.ig": "0"
+          },
+          "eth.type": "0x00000800"
+        },
+        "ip": {
+          "ip.version": "4",
+          "ip.hdr_len": "20",
+          "ip.dsfield": "0x00000000",
+          "ip.dsfield_tree": {
+            "ip.dsfield.dscp": "0",
+            "ip.dsfield.ecn": "0"
+          },
+          "ip.len": "82",
+          "ip.id": "0x0000c991",
+          "ip.flags": "0x00004000",
+          "ip.flags_tree": {
+            "ip.flags.rb": "0",
+            "ip.flags.df": "1",
+            "ip.flags.mf": "0",
+            "ip.frag_offset": "0"
+          },
+          "ip.ttl": "1",
+          "ip.proto": "17",
+          "ip.checksum": "0x00000ee5",
+          "ip.checksum.status": "2",
+          "ip.src": "192.168.0.17",
+          "ip.addr": "192.168.0.17",
+          "ip.src_host": "192.168.0.17",
+          "ip.host": "192.168.0.17",
+          "ip.dst": "224.0.0.107",
+          "ip.addr": "224.0.0.107",
+          "ip.dst_host": "224.0.0.107",
+          "ip.host": "224.0.0.107"
+        },
+        "udp": {
+          "udp.srcport": "319",
+          "udp.dstport": "319",
+          "udp.port": "319",
+          "udp.port": "319",
+          "udp.length": "62",
+          "udp.checksum": "0x0000f892",
+          "udp.checksum.status": "2",
+          "udp.stream": "1"
+        },
+        "ptp": {
+          "ptp.v2.transportspecific": "0x00000000",
+          "ptp.v2.transportspecific_tree": {
+            "ptp.v2.transportspecific.v1compatibility": "0"
+          },
+          "ptp.v2.messageid": "2",
+          "ptp.v2.versionptp": "2",
+          "ptp.v2.messagelength": "54",
+          "ptp.v2.subdomainnumber": "0",
+          "ptp.v2.flags": "0x00000000",
+          "ptp.v2.flags_tree": {
+            "ptp.v2.flags.security": "0",
+            "ptp.v2.flags.specific2": "0",
+            "ptp.v2.flags.specific1": "0",
+            "ptp.v2.flags.unicast": "0",
+            "ptp.v2.flags.twostep": "0",
+            "ptp.v2.flags.alternatemaster": "0",
+            "ptp.v2.flags.frequencytraceable": "0",
+            "ptp.v2.flags.timetraceable": "0",
+            "ptp.v2.flags.timescale": "0",
+            "ptp.v2.flags.utcreasonable": "0",
+            "ptp.v2.flags.li59": "0",
+            "ptp.v2.flags.li61": "0"
+          },
+          "correction: 0,000000 nanoseconds": {
+            "ptp.v2.correction.ns": "0",
+            "ptp.v2.correction.subns": "0"
+          },
+          "ptp.v2.clockidentity": "0x080027fffe3f2535",
+          "ptp.v2.sourceportid": "1",
+          "ptp.v2.sequenceid": "2064",
+          "ptp.v2.control": "5",
+          "ptp.v2.logmessageperiod": "127",
+          "ptp.v2.pdrq.origintimestamp.seconds": "0",
+          "ptp.v2.pdrq.origintimestamp.nanoseconds": "0"
+        }
+      }
+    }
+  }
+
+]
