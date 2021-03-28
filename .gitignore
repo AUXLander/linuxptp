@@ -1,4 +1,5 @@
 /*.d
+/*.d.*
 /*.o
 /.version
 /hwstamp_ctl
@@ -10,3 +11,4 @@
 /snmp4lptp
 /timemaster
 /ts2phc
+
