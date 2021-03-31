@@ -149,10 +149,10 @@ tmv_t get_raw_delay(struct tsproc *tsp)
 	pr_notice("t3 = %+10" PRId64, tmv_to_nanoseconds(tsp->t3));
 	pr_notice("t4 = %+10" PRId64, tmv_to_nanoseconds(tsp->t4));
 	
-	pr_notice("delay = (t2 - t3) * rr + (t4 - t1)");
+	// pr_notice("delay = (t2 - t3) * rr + (t4 - t1)");
 	pr_notice("t2 - t3 = %+10" PRId64, tmv_to_nanoseconds(t23));
 	pr_notice("t4 - t1 = %+10" PRId64, tmv_to_nanoseconds(t41));
-	pr_notice("rr = %.9f", tsp->clock_rate_ratio);
+	// pr_notice("rr = %.9f", tsp->clock_rate_ratio);
 
 	return delay;
 }
