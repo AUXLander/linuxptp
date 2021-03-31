@@ -1,0 +1,170 @@
+lenovo@RG-Test17-linux:~/Desktop/ptp/linuxptp$ sudo ./ptp4l -P -4 -i enp0s25 -m -s
+ptp4l[441209.854]: selected /dev/ptp0 as PTP clock
+ptp4l[441209.856]: port 1 (enp0s25): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[441209.856]: port 0 (/var/run/ptp4l): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[441209.856]: port 0 (/var/run/ptp4lro): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[441210.857]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441210.857]: t2 - t3 =    +222747
+ptp4l[441210.857]: t4 - t1 =    -163375
+ptp4l[441210.857]: rr = 1.000000000
+ptp4l[441210.999]: port 1 (enp0s25): new foreign master a8a159.fffe.052841-1
+ptp4l[441211.857]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441211.857]: t2 - t3 =    +151654
+ptp4l[441211.857]: t4 - t1 =     -89500
+ptp4l[441211.857]: rr = 1.000000000
+ptp4l[441212.857]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441212.857]: t2 - t3 =    +223623
+ptp4l[441212.857]: t4 - t1 =    -165000
+ptp4l[441212.857]: rr = 1.000000000
+ptp4l[441213.857]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441213.857]: t2 - t3 =    +230810
+ptp4l[441213.857]: t4 - t1 =    -172625
+ptp4l[441213.857]: rr = 1.000000000
+ptp4l[441214.857]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441214.857]: t2 - t3 =    +153279
+ptp4l[441214.857]: t4 - t1 =     -88625
+ptp4l[441214.857]: rr = 1.000000000
+ptp4l[441215.000]: selected best master clock a8a159.fffe.052841
+ptp4l[441215.000]: running in a temporal vortex
+ptp4l[441215.000]: port 1 (enp0s25): LISTENING to UNCALIBRATED on RS_SLAVE
+ptp4l[441215.857]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441215.857]: t2 - t3 =    +224029
+ptp4l[441215.858]: t4 - t1 =    -163000
+ptp4l[441215.858]: rr = 1.000000000
+ptp4l[441216.675]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441216.675]: t2 - t3 = +817646090
+ptp4l[441216.675]: t4 - t1 = -817582250
+ptp4l[441216.675]: rr = 1.000000000
+ptp4l[441216.675]: master offset     422832 s0 freq  +10165 path delay     30514
+ptp4l[441216.858]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441216.858]: t2 - t3 =    +221061
+ptp4l[441216.858]: t4 - t1 =    -162750
+ptp4l[441216.858]: rr = 1.000000000
+ptp4l[441217.675]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441217.675]: t2 - t3 = +817419187
+ptp4l[441217.675]: t4 - t1 = -817361625
+ptp4l[441217.675]: rr = 1.000000000
+ptp4l[441217.675]: master offset     424058 s1 freq  +11391 path delay     29155
+ptp4l[441217.858]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441217.858]: t2 - t3 =    +254903
+ptp4l[441217.858]: t4 - t1 =    -189750
+ptp4l[441217.858]: rr = 1.000000000
+ptp4l[441218.675]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441218.675]: t2 - t3 = +817428001
+ptp4l[441218.675]: t4 - t1 = -817369250
+ptp4l[441218.675]: rr = 1.000000000
+ptp4l[441218.675]: master offset       -791 s2 freq  +10600 path delay     32576
+ptp4l[441218.676]: port 1 (enp0s25): UNCALIBRATED to SLAVE on MASTER_CLOCK_SELECTED
+ptp4l[441218.858]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441218.858]: t2 - t3 =    +185935
+ptp4l[441218.858]: t4 - t1 =    -122125
+ptp4l[441218.858]: rr = 1.000000000
+ptp4l[441219.675]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441219.675]: t2 - t3 = +817327682
+ptp4l[441219.676]: t4 - t1 = -817261625
+ptp4l[441219.676]: rr = 1.000000000
+ptp4l[441219.676]: master offset        308 s2 freq  +11462 path delay     31905
+ptp4l[441219.858]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441219.858]: t2 - t3 =    +234216
+ptp4l[441219.858]: t4 - t1 =    -170000
+ptp4l[441219.858]: rr = 1.000000000
+ptp4l[441220.675]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441220.675]: t2 - t3 = +817503263
+ptp4l[441220.675]: t4 - t1 = -817437750
+ptp4l[441220.676]: rr = 1.000000000
+ptp4l[441220.676]: master offset        103 s2 freq  +11349 path delay     32108
+ptp4l[441220.858]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441220.858]: t2 - t3 =    +243498
+ptp4l[441220.858]: t4 - t1 =    -173875
+ptp4l[441220.858]: rr = 1.000000000
+ptp4l[441221.675]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441221.676]: t2 - t3 = +817352646
+ptp4l[441221.676]: t4 - t1 = -817286250
+ptp4l[441221.676]: rr = 1.000000000
+ptp4l[441221.676]: master offset       -600 s2 freq  +10677 path delay     34811
+ptp4l[441221.858]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441221.858]: t2 - t3 =    +234028
+ptp4l[441221.859]: t4 - t1 =    -170250
+ptp4l[441221.859]: rr = 1.000000000
+ptp4l[441222.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441222.676]: t2 - t3 = +817303726
+ptp4l[441222.676]: t4 - t1 = -817238500
+ptp4l[441222.676]: rr = 1.000000000
+ptp4l[441222.676]: master offset       1176 s2 freq  +12273 path delay     31889
+ptp4l[441222.858]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441222.858]: t2 - t3 =    +176060
+ptp4l[441222.858]: t4 - t1 =    -114875
+ptp4l[441222.858]: rr = 1.000000000
+ptp4l[441223.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441223.676]: t2 - t3 = +817420409
+ptp4l[441223.676]: t4 - t1 = -817359625
+ptp4l[441223.676]: rr = 1.000000000
+ptp4l[441223.676]: master offset       1566 s2 freq  +13016 path delay     30592
+ptp4l[441223.858]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441223.858]: t2 - t3 =    +164872
+ptp4l[441223.858]: t4 - t1 =    -105875
+ptp4l[441223.858]: rr = 1.000000000
+ptp4l[441224.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441224.676]: t2 - t3 = +817432591
+ptp4l[441224.676]: t4 - t1 = -817372250
+ptp4l[441224.676]: rr = 1.000000000
+ptp4l[441224.676]: master offset       3569 s2 freq  +15489 path delay     29498
+ptp4l[441224.859]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441224.859]: t2 - t3 =    +253715
+ptp4l[441224.859]: t4 - t1 =    -195000
+ptp4l[441224.859]: rr = 1.000000000
+ptp4l[441225.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441225.676]: t2 - t3 = +817327473
+ptp4l[441225.676]: t4 - t1 = -817269500
+ptp4l[441225.676]: rr = 1.000000000
+ptp4l[441225.676]: master offset       -876 s2 freq  +12114 path delay     29357
+ptp4l[441225.859]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441225.859]: t2 - t3 =    +231216
+ptp4l[441225.859]: t4 - t1 =    -171750
+ptp4l[441225.859]: rr = 1.000000000
+ptp4l[441226.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441226.676]: t2 - t3 = +817275717
+ptp4l[441226.676]: t4 - t1 = -817211375
+ptp4l[441226.676]: rr = 1.000000000
+ptp4l[441226.676]: master offset      -2243 s2 freq  +10484 path delay     29733
+ptp4l[441226.859]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441226.859]: t2 - t3 =    +222967
+ptp4l[441226.859]: t4 - t1 =    -160500
+ptp4l[441226.859]: rr = 1.000000000
+ptp4l[441227.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441227.676]: t2 - t3 = +817196815
+ptp4l[441227.676]: t4 - t1 = -817133375
+ptp4l[441227.676]: rr = 1.000000000
+ptp4l[441227.676]: master offset      -2919 s2 freq   +9136 path delay     31233
+ptp4l[441227.859]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441227.859]: t2 - t3 =    +224029
+ptp4l[441227.859]: t4 - t1 =    -161125
+ptp4l[441227.859]: rr = 1.000000000
+ptp4l[441228.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441228.676]: t2 - t3 = +817278973
+ptp4l[441228.676]: t4 - t1 = -817215000
+ptp4l[441228.676]: rr = 1.000000000
+ptp4l[441228.676]: master offset      -3094 s2 freq   +8085 path delay     31452
+ptp4l[441228.859]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441228.859]: t2 - t3 =    +228967
+ptp4l[441228.859]: t4 - t1 =    -169500
+ptp4l[441228.859]: rr = 1.000000000
+ptp4l[441229.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441229.676]: t2 - t3 = +817276759
+ptp4l[441229.676]: t4 - t1 = -817216250
+ptp4l[441229.676]: rr = 1.000000000
+ptp4l[441229.676]: master offset       1612 s2 freq  +11863 path delay     29733
+ptp4l[441229.859]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441229.859]: t2 - t3 =    +233279
+ptp4l[441229.860]: t4 - t1 =    -173375
+ptp4l[441229.860]: rr = 1.000000000
+ptp4l[441230.676]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441230.677]: t2 - t3 = +817269948
+ptp4l[441230.677]: t4 - t1 = -817204625
+ptp4l[441230.677]: rr = 1.000000000
+ptp4l[441230.677]: master offset       2145 s2 freq  +12879 path delay     29952
+ptp4l[441230.859]: delay = (t2 - t3) * rr + (t4 - t1)
+ptp4l[441230.860]: t2 - t3 =    +220903
+ptp4l[441230.860]: t4 - t1 =    -162625
+ptp4l[441230.860]: rr = 1.000000000
+^Clenovo@RG-Test17-linux:~/Desktop/ptp/linuxptp$ 

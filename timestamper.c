@@ -1,6 +1,6 @@
 #include "timestamper.h"
 
-#include "randvardistribution/src/distribution.h"
+// #include "randvardistribution/src/distribution.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -69,5 +69,5 @@ void track(struct ptp_message *msg)
         addr->nanoseconds = htonl(nanoseconds);
     }
     
-	pr_notice("TRANSPORT PEER: msb %lu lsb %lu", seconds_msb, seconds_lsb);
+	// pr_notice("TRANSPORT PEER: msb %lu lsb %lu", seconds_msb, seconds_lsb);
 }
