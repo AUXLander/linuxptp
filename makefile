@@ -17,14 +17,14 @@
 
 KBUILD_OUTPUT =
 
-DEBUG = -g
+DEBUG =
 CC	= $(CROSS_COMPILE)gcc
 VER     = -DVER=$(version)
 CPPFLAGS = #-fpermissive #-std=gnu++2a 
 CFLAGS	= $(VER) $(incdefs) $(DEBUG) $(EXTRA_CFLAGS)
 LDLIBS	= -lm -lrt -pthread $(EXTRA_LDFLAGS)
 PRG	= ptp4l hwstamp_ctl nsm phc2sys phc_ctl pmc timemaster ts2phc
-FILTERS	= filter.o mave.o mmedian.o
+FILTERS	= filter.o mave.o mmedian.o cfilter.o
 SERVOS	= linreg.o ntpshm.o nullf.o pi.o servo.o
 TRANSP	= raw.o transport.o timestamper.o udp.o udp6.o uds.o
 TS2PHC	= ts2phc.o lstab.o nmea.o serial.o sock.o ts2phc_generic_master.o \

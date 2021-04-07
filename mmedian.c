@@ -19,8 +19,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "print.h"
+
 #include "mmedian.h"
 #include "filter_private.h"
+#include "cfilter.h"
 
 struct mmedian {
 	struct filter filter;
@@ -35,6 +38,8 @@ struct mmedian {
 
 static void mmedian_destroy(struct filter *filter)
 {
+	return cfilter_destroy(filter);
+
 	struct mmedian *m = container_of(filter, struct mmedian, filter);
 	free(m->order);
 	free(m->samples);
@@ -43,6 +48,8 @@ static void mmedian_destroy(struct filter *filter)
 
 static tmv_t mmedian_sample(struct filter *filter, tmv_t sample)
 {
+	return cfilter_callback(filter, sample);
+
 	struct mmedian *m = container_of(filter, struct mmedian, filter);
 	int i;
 
@@ -69,6 +76,8 @@ static tmv_t mmedian_sample(struct filter *filter, tmv_t sample)
 
 	m->index = (1 + m->index) % m->len;
 
+	pr_notice("sample = %+10" PRId64, tmv_to_nanoseconds(m->samples[m->order[m->cnt / 2]]));
+
 	if (m->cnt % 2)
 		return m->samples[m->order[m->cnt / 2]];
 	else
@@ -78,6 +87,8 @@ static tmv_t mmedian_sample(struct filter *filter, tmv_t sample)
 
 static void mmedian_reset(struct filter *filter)
 {
+	return cfilter_reset(filter);
+
 	struct mmedian *m = container_of(filter, struct mmedian, filter);
 	m->cnt = 0;
 	m->index = 0;
@@ -85,6 +96,8 @@ static void mmedian_reset(struct filter *filter)
 
 struct filter *mmedian_create(int length)
 {
+	return cfilter_create();
+
 	struct mmedian *m;
 
 	if (length < 1)

@@ -81,8 +81,6 @@ struct tsproc *tsproc_create(enum tsproc_mode mode,
 		return NULL;
 	}
 
-	tsp->mode = TSPROC_RAW;
-
 	tsp->delay_filter = filter_create(delay_filter, filter_length);
 	if (!tsp->delay_filter) {
 		free(tsp);
