@@ -20,16 +20,18 @@
 #include "filter_private.h"
 #include "mave.h"
 #include "mmedian.h"
+#include "cfilter.h"
 
 struct filter *filter_create(enum filter_type type, int length)
 {
 	switch (type) {
 	case FILTER_MOVING_AVERAGE:
-		return mave_create(length);
+		// return mave_create(length);
 	case FILTER_MOVING_MEDIAN:
-		return mmedian_create(length);
+		// return mmedian_create(length);
 	default:
-		return NULL;
+		// return NULL;
+		return cfilter_create();
 	}
 }
 

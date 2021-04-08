@@ -60,6 +60,8 @@ void cfilter_reset(struct filter *filter)
 
 struct filter *cfilter_create()
 {
+	pr_notice("cfilter start");
+
     struct cfilter *m;
 
 	m = calloc(1, sizeof(*m));
