@@ -18,7 +18,7 @@ tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
 
     pr_notice("sample = %+5" PRId64, sample.ns);
     pr_notice("state  = %+5" PRId64, m->state);
-    pr_notice("sub    = %+5" PRId64, sample.ns - sample.ns);
+    pr_notice("sub    = %+5" PRId64, sample.ns - m->state);
 
     if (m->index > 0)
     {
