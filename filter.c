@@ -26,12 +26,13 @@ struct filter *filter_create(enum filter_type type, int length)
 {
 	switch (type) {
 	case FILTER_MOVING_AVERAGE:
-		// return mave_create(length);
+		return mave_create(length);
 	case FILTER_MOVING_MEDIAN:
-		// return mmedian_create(length);
-	default:
-		// return NULL;
+		return mmedian_create(length);
+	case FILTER_MOVING_CALMAN:
 		return cfilter_create();
+	default:
+		return NULL;
 	}
 }
 

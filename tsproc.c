@@ -45,6 +45,7 @@ struct tsproc {
 
 	/* Delay filter */
 	struct filter *delay_filter;
+	struct filter *offset_filter;
 };
 
 static int weighting(struct tsproc *tsp)
@@ -83,6 +84,14 @@ struct tsproc *tsproc_create(enum tsproc_mode mode,
 
 	tsp->delay_filter = filter_create(delay_filter, filter_length);
 	if (!tsp->delay_filter) {
+		free(tsp);
+		return NULL;
+	}
+
+	enum filter_type offset_filter = FILTER_MOVING_CALMAN;
+
+	tsp->offset_filter = filter_create(offset_filter, filter_length);
+	if (!tsp->offset_filter) {
 		free(tsp);
 		return NULL;
 	}
@@ -221,6 +230,8 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 
 	/* offset = t2 - t1 - delay */
 	*offset = tmv_sub(tmv_sub(tsp->t2, tsp->t1), delay);
+
+
 
 	if (!weight)
 		return 0;

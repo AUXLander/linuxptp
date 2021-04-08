@@ -60,7 +60,7 @@ void cfilter_reset(struct filter *filter)
 
 struct filter *cfilter_create()
 {
-	pr_notice("cfilter start");
+	pr_notice("calman filter start");
 
     struct cfilter *m;
 
