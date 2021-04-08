@@ -4,11 +4,6 @@ tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
 {
     struct cfilter *m = container_of(filter, struct cfilter, filter);
 
-    if (m->index == 0)
-    {
-        cfilter_set_start(m, &sample);
-    }
-
     const double Q = 2.0;
     const double R = 15.0;
     const double F = 1.0;
@@ -21,27 +16,23 @@ tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
     m->state = X0 + (int64_t)(K * (sample.ns - (int64_t)(H * X0)));
     m->covariance = (1.0 - K*H) * P0;
 
+    pr_notice("sample = %+5" PRId64, sample.ns);
+    pr_notice("state  = %+5" PRId64, m->state);
+    pr_notice("sub    = %+5" PRId64, sample.ns - sample.ns);
+
+    if (m->index > 0)
+    {
+        sample.ns = m->state;
+    }
+
     m->index = m->index + 1;
-
-    tmv_t time;
-
-    time.ns = m->state;
     
-    return time;
+    return sample;
 }
 
 void cfilter_set_start(struct cfilter *m, tmv_t* sample)
 {
-    if (sample != NULL)
-    {
-        m->state = (*sample).ns;
-    }
-    else
-    {
-        m->index = 0;
-    }
 
-    m->covariance = 0.1;
 }
 
 void cfilter_destroy(struct filter *filter)
@@ -54,8 +45,9 @@ void cfilter_destroy(struct filter *filter)
 void cfilter_reset(struct filter *filter)
 {
 	struct cfilter *m = container_of(filter, struct cfilter, filter);
-
-    cfilter_set_start(m, NULL);
+    
+    m->covariance = 0.1;
+    m->index = 0;
 }
 
 struct filter *cfilter_create()
@@ -75,7 +67,8 @@ struct filter *cfilter_create()
 	m->filter.sample  = cfilter_callback;
 	m->filter.reset   = cfilter_reset;
 
-    cfilter_set_start(m, NULL);
+    m->covariance = 0.1;
+    m->index = 0;
 
 	return &m->filter;
 }

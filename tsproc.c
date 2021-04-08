@@ -229,10 +229,10 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 	}
 
 	/* offset = t2 - t1 - delay */
-	*offset = tmv_sub(tmv_sub(tsp->t2, tsp->t1), delay);
 
-	*offset = filter_sample(tsp->offset_filter, *offset);
+	tmv_t t21 = tmv_sub(tsp->t2, tsp->t1);
 
+	*offset = tmv_sub(filter_sample(tsp->offset_filter, t21), delay);
 
 	if (!weight)
 		return 0;
