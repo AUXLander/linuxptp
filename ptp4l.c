@@ -35,6 +35,7 @@
 #include "uds.h"
 #include "util.h"
 #include "version.h"
+#include "filter.h"
 
 static void usage(char *progname)
 {
@@ -239,6 +240,8 @@ int main(int argc, char *argv[])
 	case CLOCK_TYPE_MANAGEMENT:
 		goto out;
 	}
+
+	fprintf(stderr, "config_set_int(\"delay_filter\", FILTER_MOVING_MEDIAN): %d", config_set_int(cfg, "delay_filter", FILTER_MOVING_MEDIAN));
 
 	clock = clock_create(type, cfg, req_phc);
 	if (!clock) {
