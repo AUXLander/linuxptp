@@ -1,0 +1,82 @@
+критерий синхронизации - математическое ожидание квадрат offset.
+
+Tck - абсолютное время slave в момент k;
+Tmk - абсолютное время master в момент k;
+
+Xk - абсолютное отклонение в момент k;
+Zk - измеряемое отклонение в момент k;
+
+ksi - с.в. задержки при прохождении пути временных меток по каналу связи
+eta - с.в. задержка при совершении измерений, рассчетов
+
+Xk+1 = (Tmk - Tck) - Xk + (delay + ksi);
+Zk+1 = Xk+1 + eta;
+
+////////////////////////////////////
+
+dT - время которое прошло с момента вычисления Zk.
+
+delay = (1/2)*((T2 - T3 - T1 + T4));
+
+T2 = T1 + offset + delay + ksi_1;
+T4 = T3 - offset + delay + ksi_2;
+
+Xk+1 = (1/2)*(T2 - T1 - T4 + T3 - ksi_1 - ksi_2); // offset
+Zk+1 = Zk + dT + Xk+1;
+
+// ksi_1 = ksi_2 = ksio;
+
+
+T1k+1 = T1k + dT;
+T2k+1 = T2k + dT + Xk = Zk;
+T3k+1 = T3k + dT + Xk = Zk;
+T4k+1 = T4k + dT;
+
+Xk+1 = (1/2)*(T2k+1 - T1k+1 - T4k+1 + T3k+1) - ksi; // offset
+Zk+1 = Zk + dT + Xk+1;								// current time
+
+
+X(k+1) = offset(k+1) - ksio;
+Z(k+1) = Z(k) + dT + X(k+1); // current time at k+1
+
+
+
+//////////
+
+
+T1k+1 = T1k + dT;
+T2k+1 = T2k + dT + Xk = Zk;
+T3k+1 = T3k + dT + Xk = Zk;
+T4k+1 = T4k + dT;
+
+Xk+1 = Zk -(1/2)*(T1k + T4k) - dT - ksi; // offset
+Zk+1 = Zk + dT + Xk+1;
+
+
+//////////////
+
+
+T1k+1 = T1k + dT;
+T2k+1 = T2k + dT + Xk = Zk;
+T3k+1 = T3k + dT + Xk = Zk;
+T4k+1 = T4k + dT;
+
+Zk+1 = 2*Zk -(1/2)*(T1k + T4k) + ksi;
+
+
+Xk+1 = Zk - (1/2)*(T1k + T4k);
+Zk+1 = Zk + Xk+1 + ksi;
+
+
+
+
+
+
+
+
+
+
+
+
+
+| grep "master offset .* s2" | awk '{print $4}' | cat -n -E | sed -e 'y\$\;\' > calman_Q_R.rawm
