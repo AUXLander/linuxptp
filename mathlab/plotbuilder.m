@@ -1,8 +1,8 @@
-filePath = '../linux-data/calman_Q48.0_R1000.0.mtx';
+filePath = '../linux-data/calman_Q1.0_R1.8.mtx';
 calman_001 = readmatrix(filePath, 'FileType','text');
 
 
-filePath = '../linux-data/calman_Q2.0_R1000.0.mtx';
+filePath = '../linux-data/calman_Q1.0_R2.0.mtx';
 calman_002 = readmatrix(filePath, 'FileType','text');
 
 filePath = '../linux-data/median.mtx';
@@ -11,14 +11,18 @@ median_def = readmatrix(filePath, 'FileType','text');
 hold on
 % plot(median_def(:,1),median_def(:,2), 'Color', 'b');
 % plot(calman_001(:,1),calman_001(:,2), 'Color', 'r');
-% plot(calman_002(:,1),calman_002(:,2), 'Color', 'r');
+% plot(calman_002(:,1),calman_002(:,2), 'Color', 'b');
 hold off
+
+
+% return;
+
 
 N = 1000;
 T = 1:1:N-1;
 
 sigmaEta = 100;
-sigmaKsi = 10;
+sigmaKsi = 100;
 
 xi = zeros(1, N);
 zi = zeros(1, N);
@@ -31,10 +35,11 @@ Tm(1) = 1;
 xi(1) = (Tm(1) - Tc(1)) + normrnd(0,sigmaKsi);
 zi(1) = xi(1) + normrnd(0,sigmaEta);
 
-Q = 100.0;
-R = 10000.0;
+Q = 1.0;
+R = 20.0;
 F = 1.0;
 H = 1.0;
+B = 0.0;
 
 state = Tc(1);
 covariance = 0.1;
@@ -54,7 +59,7 @@ for i=1:N-1
    
    sample = xi(i+1);
    
-   X0 = F * state;
+   X0 = F * state + B*xi(i);
    P0 = F * covariance * F + Q;
    K  = H * P0 / (H * P0 * H + R);
 
@@ -66,13 +71,13 @@ for i=1:N-1
    Tc(i+1) = Tc(i) + 1 + ci(i);
    Tm(i+1) = Tm(i) + 1;
 end
-% 
-% hold on
-% plot(1:1:N, Tc(1,:) - Tm(1,:), 'Color', 'r');
-% hold off
 
 hold on
-plot(1:1:N, zi(1,:), 'Color', 'r');
-plot(1:1:N, ci(1,:), 'Color', 'b');
+plot(1:1:N, Tc(1,:) - Tm(1,:), 'Color', 'r');
 hold off
+
+% hold on
+% plot(1:1:N, zi(1,:), 'Color', 'r');
+% plot(1:1:N, ci(1,:), 'Color', 'b');
+% hold off
 

@@ -1822,8 +1822,7 @@ enum servo_state clock_synchronize(struct clock *c, tmv_t ingress, tmv_t origin)
 	}
 
 	offset = tmv_to_nanoseconds(c->master_offset);
-	adj = servo_sample(c->servo, offset, tmv_to_nanoseconds(ingress),
-			   weight, &state);
+	adj = servo_sample(c->servo, offset, tmv_to_nanoseconds(ingress), weight, &state);
 	c->servo_state = state;
 
 	tsproc_set_clock_rate_ratio(c->tsproc, clock_rate_ratio(c));

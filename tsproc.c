@@ -229,10 +229,16 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 	}
 
 	/* offset = t2 - t1 - delay */
+	*offset = tmv_sub(tmv_sub(tsp->t2, tsp->t1), delay);
 
-	tmv_t t21 = tmv_sub(tsp->t2, tsp->t1);
+	tmv_t ingrees = tsp->t2; // Zk
 
-	*offset = tmv_sub(filter_sample(tsp->offset_filter, t21), delay);
+	// Zk+1 = Zk + (offset) + psi;
+	// Zfk+1 = Kalman(Zk+1);
+	// offset = Zfk+1 - Zk;
+
+	tmv_t Ukp1 = - tmv_div(tmv_add(tsp->t1,tsp->t4), 2);
+
 
 	if (!weight)
 		return 0;
