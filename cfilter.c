@@ -24,7 +24,7 @@ tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
     pr_notice("sample   = %+5" PRId64, tmv_to_nanoseconds(sample));
     pr_notice("Zk+1     = %+5" PRId64, tmv_to_nanoseconds(m->Zk));
     pr_notice("Zk+1 - s = %+5" PRId64, tmv_sub(m->Zk, sample));
-    pr_notice("Uk       = %+5" PRId64, -1 * tmv_to_nanoseconds(m->Ukpp));
+    //pr_notice("Uk       = %+5" PRId64, -1 * tmv_to_nanoseconds(m->Ukpp));
 
     if (m->index == 0)
     {

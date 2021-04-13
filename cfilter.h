@@ -15,7 +15,7 @@ struct cfilter
     tmv_t  Zk; // Z^k
     double Pk;
 
-    tmv_t Ukpp = 0;
+    tmv_t Ukpp;
 };
 
 tmv_t cfilter_callback(struct filter *filter, tmv_t sample);
