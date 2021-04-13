@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
+#include "cfilter.h"
 #include "tsproc.h"
 #include "filter.h"
 #include "print.h"
@@ -236,9 +237,14 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 	// Zk+1 = Zk + (offset) + psi;
 	// Zfk+1 = Kalman(Zk+1);
 	// offset = Zfk+1 - Zk;
+	
+	struct cfilter *m = container_of(tsp->offset_filter, struct cfilter, filter);
+	m->Ukpp = -tmv_div(tmv_add(tsp->t1,tsp->t4), 2);
 
-	tmv_t Ukp1 = - tmv_div(tmv_add(tsp->t1,tsp->t4), 2);
+	tmv_t Zkpp = tmv_add(ingrees, *offset);
+	tmv_t Zfkpp = filter_sample(tsp->offset_filter, Zkpp);
 
+	*offset = tmv_sub(Zfkpp, Zkpp);
 
 	if (!weight)
 		return 0;

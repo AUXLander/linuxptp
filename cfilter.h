@@ -12,8 +12,10 @@ struct cfilter
 
     int index;
 
-    int64_t  state;
-    double covariance;
+    tmv_t  Zk; // Z^k
+    double Pk;
+
+    tmv_t Ukpp;
 };
 
 tmv_t cfilter_callback(struct filter *filter, tmv_t sample);
