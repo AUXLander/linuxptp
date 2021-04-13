@@ -239,7 +239,7 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 	// offset = Zfk+1 - Zk;
 	
 	struct cfilter *m = container_of(tsp->offset_filter, struct cfilter, filter);
-	m->Ukpp = -tmv_div(tmv_add(tsp->t1,tsp->t4), 2);
+	m->Ukpp = tmv_div(tmv_add(tsp->t1,tsp->t4), 2);
 
 	tmv_t Zkpp = tmv_add(ingrees, *offset);
 	tmv_t Zfkpp = filter_sample(tsp->offset_filter, Zkpp);

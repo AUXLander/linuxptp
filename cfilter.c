@@ -12,17 +12,17 @@ tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
     const long double H = 1.0;
     const long double I = 1.0;
 
-    tmv_t Z_kp1 = nanoseconds_to_tmv(F * tmv_to_nanoseconds(m->Zk) + B * tmv_to_nanoseconds(m->Ukpp));
+    tmv_t Z_kp1 = nanoseconds_to_tmv(F * tmv_to_nanoseconds(m->Zk) + B * (-1) * tmv_to_nanoseconds(m->Ukpp));
     
     const long double P_kp1 = F * m->Pk * F + Q;
 
     const long double Kkp1 = P_kp1 * H / (H * P_kp1 * H + R);
 
-    m->Zk = nanoseconds_to_tmv((tmv_to_nanoseconds(Z_kp1) + Kkp1 * (tmv_to_nanoseconds(sample) - H * tmv_to_nanoseconds(Z_kp1)));
+    m->Zk = nanoseconds_to_tmv(tmv_to_nanoseconds(Z_kp1) + Kkp1 * (tmv_to_nanoseconds(sample) - H * tmv_to_nanoseconds(Z_kp1)));
     m->Pk = (I - Kkp1 * H) * P_kp1;
 
     pr_notice("sample = %+5" PRId64, tmv_to_nanoseconds(sample));
-    pr_notice("Uk     = %+5" PRId64, tmv_to_nanoseconds(m->Ukpp));
+    pr_notice("Uk     = %+5" PRId64, -1 * tmv_to_nanoseconds(m->Ukpp));
     pr_notice("Zk+1   = %+5" PRId64, tmv_to_nanoseconds(m->Zk));
 
     if (m->index > 0)
