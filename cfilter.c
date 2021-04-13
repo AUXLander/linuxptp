@@ -21,9 +21,10 @@ tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
     m->Zk = nanoseconds_to_tmv(tmv_to_nanoseconds(Z_kp1) + Kkp1 * (tmv_to_nanoseconds(sample) - H * tmv_to_nanoseconds(Z_kp1)));
     m->Pk = (I - Kkp1 * H) * P_kp1;
 
-    pr_notice("sample = %+5" PRId64, tmv_to_nanoseconds(sample));
-    pr_notice("Uk     = %+5" PRId64, -1 * tmv_to_nanoseconds(m->Ukpp));
-    pr_notice("Zk+1   = %+5" PRId64, tmv_to_nanoseconds(m->Zk));
+    pr_notice("sample   = %+5" PRId64, tmv_to_nanoseconds(sample));
+    pr_notice("Zk+1     = %+5" PRId64, tmv_to_nanoseconds(m->Zk));
+    pr_notice("Zk+1 - s = %+5" PRId64, tmv_sub(m->Zk, sample));
+    pr_notice("Uk       = %+5" PRId64, -1 * tmv_to_nanoseconds(m->Ukpp));
 
     if (m->index > 0)
     {

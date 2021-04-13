@@ -236,7 +236,7 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 
 	// Zk+1 = Zk + (offset) + psi;
 	// Zfk+1 = Kalman(Zk+1);
-	// offset = Zfk+1 - Zk;
+	// offset + psi = Zfk+1 - Zk;
 	
 	struct cfilter *m = container_of(tsp->offset_filter, struct cfilter, filter);
 	m->Ukpp = tmv_div(tmv_add(tsp->t1,tsp->t4), 2);
@@ -244,7 +244,7 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 	tmv_t Zkpp = tmv_add(ingrees, *offset);
 	tmv_t Zfkpp = filter_sample(tsp->offset_filter, Zkpp);
 
-	*offset = tmv_sub(Zfkpp, Zkpp);
+	*offset = tmv_sub(ingrees, Zfkpp);
 
 	if (!weight)
 		return 0;
