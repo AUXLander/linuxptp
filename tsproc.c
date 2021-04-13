@@ -173,7 +173,7 @@ int tsproc_update_delay(struct tsproc *tsp, tmv_t *delay)
 		return -1;
 
 	raw_delay = get_raw_delay(tsp);
-	tsp->filtered_delay = filter_sample(tsp->delay_filter, raw_delay);
+	tsp->filtered_delay = filter_sample(tsp->offset_filter, raw_delay);
 	tsp->filtered_delay_valid = 1;
 
 	pr_debug("delay   filtered %10" PRId64 "   raw %10" PRId64,
@@ -232,19 +232,19 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 	/* offset = t2 - t1 - delay */
 	*offset = tmv_sub(tmv_sub(tsp->t2, tsp->t1), delay);
 
-	tmv_t ingrees = tsp->t2; // Zk
+	// tmv_t ingrees = tsp->t2; // Zk
 
 	// Zk+1 = Zk + (offset) + psi;
 	// Zfk+1 = Kalman(Zk+1);
 	// offset + psi = Zfk+1 - Zk;
 	
-	struct cfilter *m = container_of(tsp->offset_filter, struct cfilter, filter);
-	m->Ukpp = tmv_div(tmv_add(tsp->t1,tsp->t4), 2);
+	// struct cfilter *m = container_of(tsp->offset_filter, struct cfilter, filter);
+	// m->Ukpp = tmv_div(tmv_add(tsp->t1,tsp->t4), 2);
 
-	tmv_t Zkpp = tmv_add(ingrees, *offset);
-	tmv_t Zfkpp = filter_sample(tsp->offset_filter, Zkpp);
+	// tmv_t Zkpp = tmv_add(ingrees, *offset);
+	// tmv_t Zfkpp = filter_sample(tsp->offset_filter, Zkpp);
 
-	*offset = tmv_sub(ingrees, Zfkpp);
+	//*offset = tmv_sub(ingrees, Zfkpp);
 
 	if (!weight)
 		return 0;

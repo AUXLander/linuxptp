@@ -8,11 +8,11 @@ tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
     const long double R = 15.0;
 
     const long double B = 1.0;
-    const long double F = 2.0;
+    const long double F = 1.0;
     const long double H = 1.0;
     const long double I = 1.0;
 
-    tmv_t Z_kp1 = nanoseconds_to_tmv(F * tmv_to_nanoseconds(m->Zk) + B * (-1) * tmv_to_nanoseconds(m->Ukpp));
+    tmv_t Z_kp1 = nanoseconds_to_tmv(F * tmv_to_nanoseconds(m->Zk)); // + B * (-1) * tmv_to_nanoseconds(m->Ukpp));
     
     const long double P_kp1 = F * m->Pk * F + Q;
 
@@ -26,11 +26,7 @@ tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
     pr_notice("Zk+1 - s = %+5" PRId64, tmv_sub(m->Zk, sample));
     pr_notice("Uk       = %+5" PRId64, -1 * tmv_to_nanoseconds(m->Ukpp));
 
-    if (m->index > 0)
-    {
-
-    }
-    else
+    if (m->index == 0)
     {
         m->Zk = sample;
         m->Pk = 0.1L;
