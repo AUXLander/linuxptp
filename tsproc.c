@@ -176,7 +176,8 @@ int tsproc_update_delay(struct tsproc *tsp, tmv_t *delay)
 		return -1;
 
 	raw_delay = get_raw_delay(tsp);
-	tsp->filtered_delay = tmv_sub(tmv_add(tsp->t4, raw_delay), filter_sample(tsp->offset_filter, tmv_add(tsp->t4, raw_delay)));
+	//tsp->filtered_delay = tmv_sub(tmv_add(tsp->t4, raw_delay), );
+	tsp->filtered_delay = filter_sample(tsp->offset_filter, tmv_add(tsp->t4, raw_delay));
 	tsp->filtered_delay_valid = 1;
 
 	
