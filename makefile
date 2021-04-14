@@ -18,7 +18,7 @@
 KBUILD_OUTPUT =
 
 DEBUG =
-CC	= $(CROSS_COMPILE)gcc
+CC	= $(CROSS_COMPILE)gcc -O3
 VER     = -DVER=$(version)
 CPPFLAGS = #-fpermissive #-std=gnu++2a 
 CFLAGS	= $(VER) $(incdefs) $(DEBUG) $(EXTRA_CFLAGS)
