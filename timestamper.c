@@ -1,11 +1,13 @@
 #include "timestamper.h"
 
-// #include "randvardistribution/src/distribution.h"
-
 #include <time.h>
 #include <stdlib.h>
 
 static int initilized = 0;
+
+extern uint64_t uniform_next();
+extern uint64_t poisson_next();
+extern uint64_t  normal_next();
 
 void track(struct ptp_message *msg)
 {
@@ -68,6 +70,10 @@ void track(struct ptp_message *msg)
         addr->seconds_lsb = htonl(seconds_lsb);
         addr->nanoseconds = htonl(nanoseconds);
     }
-    
+		
+	pr_notice("uniform: %ld", uniform_next());
+	pr_notice("poisson: %ld", poisson_next());
+	pr_notice(" normal: %ld",  normal_next());
+
 	// pr_notice("TRANSPORT PEER: msb %lu lsb %lu", seconds_msb, seconds_lsb);
 }
