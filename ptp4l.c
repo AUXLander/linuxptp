@@ -37,6 +37,11 @@
 #include "version.h"
 #include "filter.h"
 
+#include "timestamper.h"
+
+extern int noiseEnable;
+extern enum noise_type noise;
+
 static void usage(char *progname)
 {
 	fprintf(stderr,
@@ -64,7 +69,9 @@ static void usage(char *progname)
 		" -m        print messages to stdout\n"
 		" -q        do not print messages to the syslog\n"
 		" -v        prints the software version and exits\n"
-		" -h        prints this message and exits\n"
+		" -h        prints this message and exits\n\n"
+		" Simulations\n\n"
+		" -n [type]	sets type of noise: 1 -> uniform, 2 -> poisson, 3 -> normal\n"
 		"\n",
 		progname);
 }
@@ -86,11 +93,11 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	opts = config_long_options(cfg);
-
+	long argument;
 	/* Process the command line arguments. */
 	progname = strrchr(argv[0], '/');
 	progname = progname ? 1+progname : argv[0];
-	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvh",
+	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvhn:",
 				       opts, &index))) {
 		switch (c) {
 		case 0:
@@ -172,6 +179,17 @@ int main(int argc, char *argv[])
 		case '?':
 			usage(progname);
 			goto out;
+		case 'n':
+			argument = strtol(optarg, NULL, 10);
+
+			if (argument > 0 && argument < 4)
+			{
+				fprintf(stderr, "noise enable\n");
+				noiseEnable = 1;
+				noise = (enum noise_type)argument;
+			}
+
+			break;
 		default:
 			usage(progname);
 			goto out;

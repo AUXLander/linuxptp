@@ -24,7 +24,7 @@ OBJ	= bmc.o clock.o clockadj.o clockcheck.o config.o designated_fsm.o \
 SRC	= $(OBJECTS:.o=.c)
 DEPEND	= $(OBJECTS:.o=.d)
 
-all: install ptp4l subsystem
+all: subsystem install ptp4l 
 
 subsystem:
 	$(MAKE) -C $(ROOT_DIR)$(LIB_SUBDIR)
@@ -39,8 +39,11 @@ ptp4l: ptp4l.o $(OBJ)
 clean:
 	rm -f $(OBJ) $(DEPEND) $(PRG)
 
-run:
-	LD_LIBRARY_PATH="$(LIB_PATH);$LD_LIBRARY_PATH" sudo ./ptp4l -4 -S -P -i enp0s8 -m
+master:
+	sudo ./ptp4l -4 -S -P -i enp0s8 -m -n 1
+
+slave:
+	sudo ./ptp4l -4 -S -P -i enp0s8 -m -s
 
 # Implicit rule to generate a C source file's dependencies.
 %.d: %.c
