@@ -41,6 +41,11 @@ void filter_destroy(struct filter *filter)
 	filter->destroy(filter);
 }
 
+void filter_update(struct filter *filter, tmv_t offset)
+{
+	filter->update(filter, offset);
+}
+
 tmv_t filter_sample(struct filter *filter, tmv_t sample)
 {
 	return filter->sample(filter, sample);

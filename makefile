@@ -40,10 +40,10 @@ clean:
 	rm -f $(OBJ) $(DEPEND) $(PRG) *.o *.d *.d.*
 
 master:
-	sudo ./ptp4l -4 -S -P -i enp0s8 -m -n 1
+	sudo ./ptp4l -4 -H -P -i enp0s8 -m -n 1
 
 slave:
-	sudo ./ptp4l -4 -S -P -i enp0s8 -m -s
+	sudo ./ptp4l -4 -H -P -i enp0s8 -m -s
 
 # Implicit rule to generate a C source file's dependencies.
 %.d: %.c

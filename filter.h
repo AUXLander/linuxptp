@@ -62,4 +62,6 @@ tmv_t filter_sample(struct filter *filter, tmv_t sample);
  */
 void filter_reset(struct filter *filter);
 
+void filter_update(struct filter *filter, tmv_t offset);
+
 #endif
