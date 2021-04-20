@@ -42,6 +42,9 @@
 extern int noiseEnable;
 extern enum noise_type noise;
 
+extern double sigmaV;
+extern double sigmaW;
+
 static void usage(char *progname)
 {
 	fprintf(stderr,
@@ -72,6 +75,8 @@ static void usage(char *progname)
 		" -h        prints this message and exits\n\n"
 		" Simulations\n\n"
 		" -n [type]	sets type of noise: 1 -> uniform, 2 -> poisson, 3 -> normal\n"
+		" -W [sigma] "
+		" -V [sigma] "
 		"\n",
 		progname);
 }
@@ -97,7 +102,7 @@ int main(int argc, char *argv[])
 	/* Process the command line arguments. */
 	progname = strrchr(argv[0], '/');
 	progname = progname ? 1+progname : argv[0];
-	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvhn:",
+	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvhn:W:V:",
 				       opts, &index))) {
 		switch (c) {
 		case 0:
@@ -188,8 +193,18 @@ int main(int argc, char *argv[])
 				noiseEnable = 1;
 				noise = (enum noise_type)argument;
 			}
-
 			break;
+
+		case 'W':
+			sigmaW = strtod(optarg, NULL);
+			fprintf(stderr, "sigmaW: %lf\n", sigmaW);
+			break;
+			
+		case 'V':
+			sigmaV = strtod(optarg, NULL);
+			fprintf(stderr, "sigmaV: %lf\n", sigmaV);
+			break;
+
 		default:
 			usage(progname);
 			goto out;

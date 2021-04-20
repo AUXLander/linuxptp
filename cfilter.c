@@ -17,6 +17,9 @@ struct cfilter
     uint64_t index;
 };
 
+double sigmaV = 30;
+double sigmaW = 10;
+
 static double matrixA(tmv_t Q, tmv_t X)
 {
     return 1.0 + tmv_dbl(Q) / tmv_dbl(X);
@@ -33,8 +36,9 @@ static tmv_t cfilter_sample(struct filter *filter, tmv_t Y)
 {
     struct cfilter *c = container_of(filter, struct cfilter, filter);
 
-    const double M_Vk = 10 * 10;
-    const double M_Wk = 10 * 10;
+    const double M_Vk = sigmaV * sigmaV;
+    const double M_Wk = sigmaW * sigmaW;
+    
     const double M_1_Wk = 1.0 / M_Wk;
 
     const double C = 1.0;
