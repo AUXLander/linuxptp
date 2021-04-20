@@ -1,55 +1,83 @@
 #include "cfilter.h"
 
-tmv_t cfilter_callback(struct filter *filter, tmv_t sample)
+struct cfilter
 {
-    struct cfilter *m = container_of(filter, struct cfilter, filter);
+	struct filter filter;
 
-    const long double Q = 2.0;
-    const long double R = 15.0;
+    double (*A)(tmv_t, tmv_t);
 
-    const long double B = 1.0;
-    const long double F = 1.0;
-    const long double H = 1.0;
-    const long double I = 1.0;
+    tmv_t  Q;
 
-    tmv_t Z_kp1 = nanoseconds_to_tmv(F * tmv_to_nanoseconds(m->Zk)); // + B * (-1) * tmv_to_nanoseconds(m->Ukpp));
+    tmv_t  bX;
+    double bP;
+
+    tmv_t  aX;
+    double aP;
     
-    const long double P_kp1 = F * m->Pk * F + Q;
+    uint64_t index;
+};
 
-    const long double Kkp1 = P_kp1 * H / (H * P_kp1 * H + R);
+static double matrixA(tmv_t Q, tmv_t X)
+{
+    return 1.0 + tmv_dbl(Q) / tmv_dbl(X);
+}
 
-    m->Zk = nanoseconds_to_tmv(tmv_to_nanoseconds(Z_kp1) + Kkp1 * (tmv_to_nanoseconds(sample) - H * tmv_to_nanoseconds(Z_kp1)));
-    m->Pk = (I - Kkp1 * H) * P_kp1;
+static void cfilter_update(struct filter *filter, tmv_t offset)
+{
+    struct cfilter *c = container_of(filter, struct cfilter, filter);
 
-    pr_notice("sample   = %+5" PRId64, tmv_to_nanoseconds(sample));
-    pr_notice("Zk+1     = %+5" PRId64, tmv_to_nanoseconds(m->Zk));
-    pr_notice("Zk+1 - s = %+5" PRId64, tmv_sub(m->Zk, sample));
-    //pr_notice("Uk       = %+5" PRId64, -1 * tmv_to_nanoseconds(m->Ukpp));
+    c->Q = offset;
+}
 
-    if (m->index == 0)
+static tmv_t cfilter_sample(struct filter *filter, tmv_t Y)
+{
+    struct cfilter *c = container_of(filter, struct cfilter, filter);
+
+    const double M_Vk = 10 * 10;
+    const double M_Wk = 10 * 10;
+    const double M_1_Wk = 1.0 / M_Wk;
+
+    const double C = 1.0;
+
+    if (c->index == 0)
     {
-        m->Zk = sample;
-        m->Pk = 0.1L;
+        c->aX = Y;
+        c->aP = 0.1;
+    }
+    else
+    {
+        const double A = c->A(c->Q, c->aX);
+
+        // A * aX;
+        const tmv_t  bX = dbl_tmv(tmv_dbl(c->aX) * A);
+        // A * aP * A + M_Vk;
+        const double bP = A * c->aP * A + M_Vk;
+        // bX + (1.0/((1.0 / bP) + C*M_1_Wk*C)) *C*M_1_Wk*(Y - C*bX);
+        const tmv_t  aX = tmv_add(bX, dbl_tmv((1.0 / ((1.0/bP) + C*M_1_Wk*C)) * C * M_1_Wk * tmv_dbl(tmv_sub(Y, dbl_tmv((tmv_dbl(bX) * C))))));
+        // 1.0/((1.0/bP) + C*M_1_Wk*C);
+        const double aP = 1.0 / ((1.0/bP) + C*M_1_Wk*C);
+
+        //pr_notice("sample = %+5" PRId64, tmv_to_nanoseconds(sample));
+
+        c->bX = bX;
+        c->bP = bP;
+        c->aX = aX;
+        c->aP = aP;
     }
 
-    m->index = m->index + 1;
+    c->index = c->index + 1;
     
-    return m->Zk;
+    return c->aX;
 }
 
-void cfilter_set_start(struct cfilter *m, tmv_t* sample)
-{
-
-}
-
-void cfilter_destroy(struct filter *filter)
+static void cfilter_destroy(struct filter *filter)
 {
 	struct cfilter *m = container_of(filter, struct cfilter, filter);
 
 	free(m);
 }
 
-void cfilter_reset(struct filter *filter)
+static void cfilter_reset(struct filter *filter)
 {
 	struct cfilter *m = container_of(filter, struct cfilter, filter);
     
@@ -60,20 +88,23 @@ struct filter *cfilter_create()
 {
 	pr_notice("calman filter start");
 
-    struct cfilter *m;
+    struct cfilter *c;
 
-	m = calloc(1, sizeof(*m));
+	c = calloc(1, sizeof(*c));
 
-	if (!m)
+	if (!c)
     {
         return NULL;
     }
 
-	m->filter.destroy = cfilter_destroy;
-	m->filter.sample  = cfilter_callback;
-	m->filter.reset   = cfilter_reset;
+	c->filter.destroy = cfilter_destroy;
+	c->filter.sample  = cfilter_sample;
+	c->filter.reset   = cfilter_reset;
 
-    m->index = 0;
+    c->Q = nanoseconds_to_tmv(0);
+    c->A = matrixA;
 
-	return &m->filter;
+    c->index = 0;
+
+	return &c->filter;
 }

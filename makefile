@@ -37,7 +37,7 @@ ptp4l: ptp4l.o $(OBJ)
 	gcc $(OBJ) $(LDLIBS) -o ptp4l ptp4l.o $(LIB_NAME)
 
 clean:
-	rm -f $(OBJ) $(DEPEND) $(PRG)
+	rm -f $(OBJ) $(DEPEND) $(PRG) *.o *.d *.d.*
 
 master:
 	sudo ./ptp4l -4 -S -P -i enp0s8 -m -n 1
