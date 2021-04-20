@@ -100,6 +100,7 @@ struct filter *cfilter_create()
 	c->filter.destroy = cfilter_destroy;
 	c->filter.sample  = cfilter_sample;
 	c->filter.reset   = cfilter_reset;
+    c->filter.update  = cfilter_update;
 
     c->Q = nanoseconds_to_tmv(0);
     c->A = matrixA;
