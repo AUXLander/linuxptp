@@ -22,8 +22,7 @@
 #include "tmv.h"
 #include "contain.h"
 
-struct filter
-{
+struct filter {
 	void (*destroy)(struct filter *filter);
 
 	tmv_t (*sample)(struct filter *filter, tmv_t sample);

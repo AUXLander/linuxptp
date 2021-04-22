@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "mmedian.h"
 #include "filter_private.h"
 
@@ -70,8 +69,6 @@ static tmv_t mmedian_sample(struct filter *filter, tmv_t sample)
 
 	m->index = (1 + m->index) % m->len;
 
-//	pr_notice("sample = %+10" PRId64, tmv_to_nanoseconds(m->samples[m->order[m->cnt / 2]]));
-
 	if (m->cnt % 2)
 		return m->samples[m->order[m->cnt / 2]];
 	else
@@ -89,7 +86,7 @@ static void mmedian_reset(struct filter *filter)
 struct filter *mmedian_create(int length)
 {
 	pr_notice("Median filter start!");
-
+	
 	struct mmedian *m;
 
 	if (length < 1)

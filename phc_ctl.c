@@ -344,7 +344,7 @@ static int do_cmp(clockid_t clkid, int cmdc, char *cmdv[])
 
 	if (method >= 0 && sysoff_measure(CLOCKID_TO_FD(clkid), method, 9,
 					  &sys_offset, &sys_ts, &delay) >= 0) {
-		pr_notice( "offset from CLOCK_REALTIME is %lldns\n",
+		pr_notice( "offset from CLOCK_REALTIME is %"PRId64"ns\n",
 			sys_offset);
 		return 0;
 	}
@@ -361,7 +361,7 @@ static int do_cmp(clockid_t clkid, int cmdc, char *cmdv[])
 	}
 
 	offset = calculate_offset(&rta, &ts, &rtb);
-	pr_notice( "offset from CLOCK_REALTIME is approximately %lldns\n",
+	pr_notice( "offset from CLOCK_REALTIME is approximately %"PRId64"ns\n",
 		offset);
 
 	return 0;

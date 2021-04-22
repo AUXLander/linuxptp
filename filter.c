@@ -24,8 +24,7 @@
 
 struct filter *filter_create(enum filter_type type, int length)
 {
-	switch (type) 
-	{
+	switch (type) {
 	case FILTER_MOVING_AVERAGE:
 		return mave_create(length);
 	case FILTER_MOVING_MEDIAN:

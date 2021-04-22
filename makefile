@@ -1,5 +1,7 @@
 ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
+incdefs := $(shell $(ROOT_DIR)/incdefs.sh)
+
 LIB_NAME = libdistribution.so
 LIB_SUBDIR = /randvardistribution/src/
 LIB_PATH = $(ROOT_DIR)$(LIB_SUBDIR)$(LIB_NAME)
@@ -7,7 +9,7 @@ LIB_PATH = $(ROOT_DIR)$(LIB_SUBDIR)$(LIB_NAME)
 LIB_INSTALL_PATH = /usr/lib/
 
 CC = $(CROSS_COMPILE)gcc
-CFLAGS = -O3
+CFLAGS = -O3 $(incdefs)
 LDLIBS = -lm -lrt -pthread $(EXTRA_LDFLAGS)
 PRG	= ptp4l
 
@@ -44,6 +46,9 @@ master:
 
 slave:
 	sudo ./ptp4l -4 -H -P -i enp0s8 -m -s
+
+testdef:
+	echo $(incdefs)
 
 # Implicit rule to generate a C source file's dependencies.
 %.d: %.c

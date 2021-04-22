@@ -1070,7 +1070,7 @@ static void port_nrate_initialize(struct port *p)
 
 	p->nrate.origin1 = tmv_zero();
 	p->nrate.ingress1 = tmv_zero();
-	p->nrate.max_count = (1 << shift);
+	p->nrate.max_count = (1U << shift);
 	p->nrate.count = 0;
 	p->nrate.ratio = 1.0;
 	p->nrate.ratio_valid = 0;

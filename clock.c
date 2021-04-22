@@ -404,7 +404,7 @@ static int clock_management_fill_response(struct clock *c, struct port *p,
 		break;
 	case TLV_SLAVE_ONLY:
 		mtd = (struct management_tlv_datum *) tlv->data;
-		mtd->val = c->dds.flags & DDS_SLAVE_ONLY;
+		mtd->val = c->dds.flags & DDS_SLAVE_ONLY ? 1 : 0;
 		datalen = sizeof(*mtd);
 		break;
 	case TLV_CLOCK_ACCURACY:
@@ -1822,7 +1822,8 @@ enum servo_state clock_synchronize(struct clock *c, tmv_t ingress, tmv_t origin)
 	}
 
 	offset = tmv_to_nanoseconds(c->master_offset);
-	adj = servo_sample(c->servo, offset, tmv_to_nanoseconds(ingress), weight, &state);
+	adj = servo_sample(c->servo, offset, tmv_to_nanoseconds(ingress),
+			   weight, &state);
 	c->servo_state = state;
 
 	tsproc_set_clock_rate_ratio(c->tsproc, clock_rate_ratio(c));
@@ -1880,7 +1881,7 @@ void clock_sync_interval(struct clock *c, int n)
 		shift = sizeof(int) * 8 - 1;
 		pr_warning("freq_est_interval is too long");
 	}
-	c->fest.max_count = (1 << shift);
+	c->fest.max_count = (1U << shift);
 
 	shift = c->stats_interval - n;
 	if (shift < 0)
@@ -1889,7 +1890,7 @@ void clock_sync_interval(struct clock *c, int n)
 		shift = sizeof(int) * 8 - 1;
 		pr_warning("summary_interval is too long");
 	}
-	c->stats.max_count = (1 << shift);
+	c->stats.max_count = (1U << shift);
 
 	servo_sync_interval(c->servo, n < 0 ? 1.0 / (1 << -n) : 1 << n);
 }
