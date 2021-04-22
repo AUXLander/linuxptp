@@ -45,6 +45,10 @@ extern enum noise_type noise;
 extern double sigmaV;
 extern double sigmaW;
 
+const char* fltr_mave = "MAVE";
+const char* fltr_median = "MEDIAN";
+const char* fltr_kalman = "KALMAN";
+
 static void usage(char *progname)
 {
 	fprintf(stderr,
@@ -74,11 +78,12 @@ static void usage(char *progname)
 		" -v        prints the software version and exits\n"
 		" -h        prints this message and exits\n\n"
 		" Simulations\n\n"
-		" -n [type]	sets type of noise: 1 -> uniform, 2 -> poisson, 3 -> normal\n"
-		" -W [sigma] "
-		" -V [sigma] "
+		" -n [type]   sets type of noise: 1 -> uniform, 2 -> poisson, 3 -> normal\n"
+		" -W [sigma]  Sigma of process noise \n"
+		" -V [sigma]  Sigma of measurement noise \n"
+		" -F [filter] set one of avaible filters: %s, %s, %s\n"
 		"\n",
-		progname);
+		progname, fltr_mave, fltr_median, fltr_kalman);
 }
 
 int main(int argc, char *argv[])
@@ -102,7 +107,7 @@ int main(int argc, char *argv[])
 	/* Process the command line arguments. */
 	progname = strrchr(argv[0], '/');
 	progname = progname ? 1+progname : argv[0];
-	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvhn:W:V:",
+	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvhn:W:V:F:",
 				       opts, &index))) {
 		switch (c) {
 		case 0:
@@ -205,6 +210,30 @@ int main(int argc, char *argv[])
 			fprintf(stderr, "sigmaV: %lf\n", sigmaV);
 			break;
 
+		case 'F':
+			if (strcmp(optarg, fltr_mave) == 0)
+			{
+				config_set_int(cfg, "delay_filter", FILTER_MOVING_AVERAGE);
+				fprintf(stderr, "Selected filter: %s\n", fltr_mave);
+			}
+			else if (strcmp(optarg, fltr_median) == 0)
+			{
+				config_set_int(cfg, "delay_filter", FILTER_MOVING_MEDIAN);
+				fprintf(stderr, "Selected filter: %s\n", fltr_median);
+			}
+			else if (strcmp(optarg, fltr_kalman) == 0)
+			{
+				config_set_int(cfg, "delay_filter", FILTER_MOVING_KALMAN);
+				fprintf(stderr, "Selected filter: %s\n", fltr_kalman);
+			}
+			else
+			{
+				fprintf(stderr, "Unknown filter selected!\n");
+				goto out;
+			}
+
+			break;
+
 		default:
 			usage(progname);
 			goto out;
@@ -273,8 +302,6 @@ int main(int argc, char *argv[])
 	case CLOCK_TYPE_MANAGEMENT:
 		goto out;
 	}
-
-	fprintf(stderr, "config_set_int(\"delay_filter\", FILTER_MOVING_MEDIAN): %d", config_set_int(cfg, "delay_filter", FILTER_MOVING_MEDIAN));
 
 	clock = clock_create(type, cfg, req_phc);
 	if (!clock) {

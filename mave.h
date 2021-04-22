@@ -20,6 +20,7 @@
 #ifndef HAVE_MAVE_H
 #define HAVE_MAVE_H
 
+#include "print.h"
 #include "filter.h"
 
 struct filter *mave_create(int length);

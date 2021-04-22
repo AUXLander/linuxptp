@@ -1,6 +1,6 @@
-#include "cfilter.h"
+#include "kalman.h"
 
-struct cfilter
+struct kalman
 {
 	struct filter filter;
 
@@ -25,16 +25,16 @@ static double matrixA(tmv_t Q, tmv_t X)
     return 1.0 + tmv_dbl(Q) / tmv_dbl(X);
 }
 
-static void cfilter_update(struct filter *filter, tmv_t offset)
+static void kalman_update(struct filter *filter, tmv_t offset)
 {
-    struct cfilter *c = container_of(filter, struct cfilter, filter);
+    struct kalman *c = container_of(filter, struct kalman, filter);
 
     c->Q = offset;
 }
 
-static tmv_t cfilter_sample(struct filter *filter, tmv_t Y)
+static tmv_t kalman_sample(struct filter *filter, tmv_t Y)
 {
-    struct cfilter *c = container_of(filter, struct cfilter, filter);
+    struct kalman *c = container_of(filter, struct kalman, filter);
 
     const double M_Vk = sigmaV * sigmaV;
     const double M_Wk = sigmaW * sigmaW;
@@ -74,25 +74,25 @@ static tmv_t cfilter_sample(struct filter *filter, tmv_t Y)
     return c->aX;
 }
 
-static void cfilter_destroy(struct filter *filter)
+static void kalman_destroy(struct filter *filter)
 {
-	struct cfilter *m = container_of(filter, struct cfilter, filter);
+	struct kalman *m = container_of(filter, struct kalman, filter);
 
 	free(m);
 }
 
-static void cfilter_reset(struct filter *filter)
+static void kalman_reset(struct filter *filter)
 {
-	struct cfilter *m = container_of(filter, struct cfilter, filter);
+	struct kalman *m = container_of(filter, struct kalman, filter);
     
     m->index = 0;
 }
 
-struct filter *cfilter_create()
+struct filter *kalman_create()
 {
-	pr_notice("calman filter start");
+	pr_notice("Kalman filter start!");
 
-    struct cfilter *c;
+    struct kalman *c;
 
 	c = calloc(1, sizeof(*c));
 
@@ -101,10 +101,10 @@ struct filter *cfilter_create()
         return NULL;
     }
 
-	c->filter.destroy = cfilter_destroy;
-	c->filter.sample  = cfilter_sample;
-	c->filter.reset   = cfilter_reset;
-    c->filter.update  = cfilter_update;
+	c->filter.destroy = kalman_destroy;
+	c->filter.sample  = kalman_sample;
+	c->filter.reset   = kalman_reset;
+    c->filter.update  = kalman_update;
 
     c->Q = nanoseconds_to_tmv(0);
     c->A = matrixA;

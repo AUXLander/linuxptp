@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include "cfilter.h"
+#include "kalman.h"
 #include "tsproc.h"
 #include "filter.h"
 #include "print.h"
@@ -46,7 +46,6 @@ struct tsproc {
 
 	/* Delay filter */
 	struct filter *delay_filter;
-	struct filter *offset_filter;
 };
 
 static int weighting(struct tsproc *tsp)
@@ -85,14 +84,6 @@ struct tsproc *tsproc_create(enum tsproc_mode mode,
 
 	tsp->delay_filter = filter_create(delay_filter, filter_length);
 	if (!tsp->delay_filter) {
-		free(tsp);
-		return NULL;
-	}
-
-	enum filter_type offset_filter = FILTER_MOVING_CALMAN;
-
-	tsp->offset_filter = filter_create(offset_filter, filter_length);
-	if (!tsp->offset_filter) {
 		free(tsp);
 		return NULL;
 	}
@@ -175,8 +166,7 @@ int tsproc_update_delay(struct tsproc *tsp, tmv_t *delay)
 		
 	tmv_t raw_delay = get_raw_delay(tsp);
 
-	//tsp->filtered_delay = filter_sample(tsp->delay_filter,  raw_delay);
-	tsp->filtered_delay = filter_sample(tsp->offset_filter, raw_delay);
+	tsp->filtered_delay = filter_sample(tsp->delay_filter,  raw_delay);
 
 	tsp->filtered_delay_valid = 1;
 
@@ -234,11 +224,8 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 	}
 
 	/* offset = t2 - t1 - delay */
-	const tmv_t v_offset = tmv_sub(tmv_sub(tsp->t2, tsp->t1), delay);
 
-	*offset = v_offset;
-
-	filter_update(tsp->offset_filter, v_offset);
+	*offset = filter_update(tsp->delay_filter, tmv_sub(tmv_sub(tsp->t2, tsp->t1), delay));
 
 	if (!weight)
 		return 0;

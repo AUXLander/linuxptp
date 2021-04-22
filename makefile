@@ -7,11 +7,11 @@ LIB_PATH = $(ROOT_DIR)$(LIB_SUBDIR)$(LIB_NAME)
 LIB_INSTALL_PATH = /usr/lib/
 
 CC = $(CROSS_COMPILE)gcc
-CFLAGS	= -O3
-LDLIBS	= -lm -lrt -pthread $(EXTRA_LDFLAGS)
+CFLAGS = -O3
+LDLIBS = -lm -lrt -pthread $(EXTRA_LDFLAGS)
 PRG	= ptp4l
 
-FILTERS	= filter.o mave.o mmedian.o cfilter.o
+FILTERS	= filter.o mave.o mmedian.o kalman.o
 SERVOS	= linreg.o ntpshm.o nullf.o pi.o servo.o
 TRANSP	= raw.o transport.o udp.o udp6.o uds.o timestamper.o 
 
@@ -40,7 +40,7 @@ clean:
 	rm -f $(OBJ) $(DEPEND) $(PRG) *.o *.d *.d.*
 
 master:
-	sudo ./ptp4l -4 -H -P -i enp0s8 -m -n 1
+	sudo ./ptp4l -4 -H -P -i enp0s8 -m
 
 slave:
 	sudo ./ptp4l -4 -H -P -i enp0s8 -m -s

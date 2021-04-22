@@ -9,6 +9,6 @@
 #include "print.h"
 #include "filter_private.h"
 
-struct filter *cfilter_create();
+struct filter *kalman_create();
 
 #endif
