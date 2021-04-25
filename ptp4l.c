@@ -37,11 +37,6 @@
 #include "version.h"
 #include "filter.h"
 
-#include "timestamper.h"
-
-extern int noiseEnable;
-extern enum noise_type noise;
-
 extern double sigmaV;
 extern double sigmaW;
 
@@ -79,7 +74,6 @@ static void usage(char *progname)
 		" -v        prints the software version and exits\n"
 		" -h        prints this message and exits\n\n"
 		" Simulations\n\n"
-		" -n [type]   sets type of noise: 1 -> uniform, 2 -> poisson, 3 -> normal\n"
 		" -W [sigma]  Sigma of process noise \n"
 		" -V [sigma]  Sigma of measurement noise \n"
 		" -F [filter] set one of avaible filters: %s, %s, %s\n"
@@ -109,7 +103,7 @@ int main(int argc, char *argv[])
 	/* Process the command line arguments. */
 	progname = strrchr(argv[0], '/');
 	progname = progname ? 1+progname : argv[0];
-	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvhn:W:V:F:",
+	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvhW:V:F:",
 				       opts, &index))) {
 		switch (c) {
 		case 0:
@@ -191,17 +185,6 @@ int main(int argc, char *argv[])
 		case '?':
 			usage(progname);
 			goto out;
-		case 'n':
-			argument = strtol(optarg, NULL, 10);
-
-			if (argument > 0 && argument < 4)
-			{
-				fprintf(stderr, "noise enable\n");
-				noiseEnable = 1;
-				noise = (enum noise_type)argument;
-			}
-			break;
-
 		case 'W':
 			sigmaW = strtod(optarg, NULL);
 			fprintf(stderr, "sigmaW: %lf\n", sigmaW);

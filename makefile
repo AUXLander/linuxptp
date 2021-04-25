@@ -15,7 +15,7 @@ PRG	= ptp4l
 
 FILTERS	= filter.o mave.o mmedian.o kalman.o
 SERVOS	= linreg.o ntpshm.o nullf.o pi.o servo.o
-TRANSP	= raw.o transport.o udp.o udp6.o uds.o timestamper.o 
+TRANSP	= raw.o transport.o udp.o udp6.o uds.o
 
 OBJ	= bmc.o clock.o clockadj.o clockcheck.o config.o \
  e2e_tc.o fault.o $(FILTERS) fsm.o hash.o msg.o phc.o \
@@ -26,17 +26,10 @@ OBJ	= bmc.o clock.o clockadj.o clockcheck.o config.o \
 SRC	= $(OBJECTS:.o=.c)
 DEPEND	= $(OBJECTS:.o=.d)
 
-all: subsystem install ptp4l 
-
-subsystem:
-	$(MAKE) -C $(ROOT_DIR)$(LIB_SUBDIR)
-
-install:
-	sudo rm -f $(LIB_INSTALL_PATH)$(LIB_NAME)
-	sudo cp -f $(LIB_PATH) $(LIB_INSTALL_PATH)
+all: ptp4l 
 
 ptp4l: ptp4l.o $(OBJ) 
-	gcc $(OBJ) $(LDLIBS) -o ptp4l ptp4l.o $(LIB_NAME)
+	gcc $(OBJ) $(LDLIBS) -o ptp4l ptp4l.o
 
 clean:
 	rm -f $(OBJ) $(DEPEND) $(PRG) *.o *.d *.d.*
