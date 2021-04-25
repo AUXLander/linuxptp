@@ -1,8 +1,9 @@
-% filePath = '../test/kalman_v2.5_w1.mtx'; sigmaV = 2.5; sigmaW = 1;
+filePath = '../test/kalman_v2.5_w1.mtx'; sigmaV = 2.5; sigmaW = 1;
 % filePath = '../test/kalman_v2.5_w2.5.mtx'; sigmaV = 2.5; sigmaW = 2.5;
 % filePath = '../test/kalman_v5_w1.mtx'; sigmaV = 5; sigmaW = 1;
-filePath = '../test/kalman_v5_w5.mtx'; sigmaV = 5; sigmaW = 5;
+% filePath = '../test/kalman_v5_w5.mtx'; sigmaV = 5; sigmaW = 5;
 % filePath = '../test/kalman_v10_w5.mtx'; sigmaV = 10; sigmaW = 5;
+% filePath = '../test/kalman_v10_w10.mtx'; sigmaV = 10; sigmaW = 10;
 % filePath = '../test/kalman_v15_w5.mtx'; sigmaV = 15; sigmaW = 5;
 % filePath = '../test/kalman_v15_w10.mtx'; sigmaV = 15; sigmaW = 10;
 % filePath = '../test/kalman_v30_w25.mtx'; sigmaV = 30; sigmaW = 25;
