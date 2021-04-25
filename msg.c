@@ -19,7 +19,6 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <malloc.h>
-#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
@@ -27,6 +26,9 @@
 #include "msg.h"
 #include "print.h"
 #include "tlv.h"
+
+#define VERSION_MASK 0x0f
+#define VERSION      0x02
 
 int assume_two_step = 0;
 
@@ -37,8 +39,8 @@ int assume_two_step = 0;
 
 struct message_storage {
 	unsigned char reserved[MSG_HEADROOM];
-	struct ptp_message msg __attribute__((aligned (8)));
-};
+	struct ptp_message msg;
+} PACKED;
 
 static TAILQ_HEAD(msg_pool, ptp_message) msg_pool = TAILQ_HEAD_INITIALIZER(msg_pool);
 
@@ -78,7 +80,7 @@ static void announce_post_recv(struct announce_msg *m)
 
 static int hdr_post_recv(struct ptp_header *m)
 {
-	if ((m->ver & MAJOR_VERSION_MASK) != PTP_MAJOR_VERSION)
+	if ((m->ver & VERSION_MASK) != VERSION)
 		return -EPROTO;
 	m->messageLength = ntohs(m->messageLength);
 	m->correction = net2host64(m->correction);

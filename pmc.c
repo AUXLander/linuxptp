@@ -28,7 +28,6 @@
 
 #include "ds.h"
 #include "fsm.h"
-#include "notification.h"
 #include "pmc_common.h"
 #include "print.h"
 #include "tlv.h"
@@ -39,7 +38,6 @@
 static struct pmc *pmc;
 
 #define IFMT "\n\t\t"
-#define P41 ((double)(1ULL << 41))
 
 static char *text2str(struct PTPText *text)
 {
@@ -55,112 +53,23 @@ static char *bin2str(Octet *data, int len)
 	return bin2str_impl(data, len, buf, sizeof(buf));
 }
 
-#define SHOW_TIMESTAMP(ts) \
-	((uint64_t)ts.seconds_lsb) | (((uint64_t)ts.seconds_msb) << 32), ts.nanoseconds
-
-static void pmc_show_delay_timing(struct slave_delay_timing_record *record,
-				  FILE *fp)
-{
-	fprintf(fp,
-		IFMT "sequenceId                 %hu"
-		IFMT "delayOriginTimestamp       %" PRId64 ".%09u"
-		IFMT "totalCorrectionField       %" PRId64
-		IFMT "delayResponseTimestamp     %" PRId64 ".%09u",
-		record->sequenceId,
-		SHOW_TIMESTAMP(record->delayOriginTimestamp),
-		record->totalCorrectionField >> 16,
-		SHOW_TIMESTAMP(record->delayResponseTimestamp));
-}
-
-static void pmc_show_rx_sync_timing(struct slave_rx_sync_timing_record *record,
-				    FILE *fp)
-{
-	fprintf(fp,
-		IFMT "sequenceId                 %hu"
-		IFMT "syncOriginTimestamp        %" PRId64 ".%09u"
-		IFMT "totalCorrectionField       %" PRId64
-		IFMT "scaledCumulativeRateOffset %u"
-		IFMT "syncEventIngressTimestamp  %" PRId64 ".%09u",
-		record->sequenceId,
-		SHOW_TIMESTAMP(record->syncOriginTimestamp),
-		record->totalCorrectionField >> 16,
-		record->scaledCumulativeRateOffset,
-		SHOW_TIMESTAMP(record->syncEventIngressTimestamp));
-}
-
-static void pmc_show_signaling(struct ptp_message *msg, FILE *fp)
-{
-	struct slave_rx_sync_timing_record *sync_record;
-	struct slave_delay_timing_record *delay_record;
-	struct slave_rx_sync_timing_data_tlv *srstd;
-	struct slave_delay_timing_data_tlv *sdtdt;
-	struct tlv_extra *extra;
-	int i, cnt;
-
-	fprintf(fp, "\t%s seq %hu %s ",
-		pid2str(&msg->header.sourcePortIdentity),
-		msg->header.sequenceId, "SIGNALING");
-
-	TAILQ_FOREACH(extra, &msg->tlv_list, list) {
-		switch (extra->tlv->type) {
-		case TLV_SLAVE_RX_SYNC_TIMING_DATA:
-			srstd = (struct slave_rx_sync_timing_data_tlv *) extra->tlv;
-			cnt = (srstd->length - sizeof(srstd->sourcePortIdentity)) /
-				sizeof(*sync_record);
-			fprintf(fp, "SLAVE_RX_SYNC_TIMING_DATA N %d "
-				IFMT "sourcePortIdentity         %s",
-				cnt, pid2str(&srstd->sourcePortIdentity));
-			sync_record = srstd->record;
-			for (i = 0; i < cnt; i++) {
-				pmc_show_rx_sync_timing(sync_record, fp);
-				sync_record++;
-			}
-			break;
-		case TLV_SLAVE_DELAY_TIMING_DATA_NP:
-			sdtdt = (struct slave_delay_timing_data_tlv *) extra->tlv;
-			cnt = (sdtdt->length - sizeof(sdtdt->sourcePortIdentity)) /
-				sizeof(*delay_record);
-			fprintf(fp, "SLAVE_DELAY_TIMING_DATA_NP N %d "
-				IFMT "sourcePortIdentity         %s",
-				cnt, pid2str(&sdtdt->sourcePortIdentity));
-			delay_record = sdtdt->record;
-			for (i = 0; i < cnt; i++) {
-				pmc_show_delay_timing(delay_record, fp);
-				delay_record++;
-			}
-			break;
-		default:
-			break;
-		}
-	}
-	fprintf(fp, "\n");
-	fflush(fp);
-}
-
 static void pmc_show(struct ptp_message *msg, FILE *fp)
 {
-	struct grandmaster_settings_np *gsn;
-	struct mgmt_clock_description *cd;
-	struct subscribe_events_np *sen;
-	struct management_tlv_datum *mtd;
-	struct port_properties_np *ppn;
-	struct timePropertiesDS *tp;
+	int action;
+	struct TLV *tlv;
 	struct management_tlv *mgt;
-	struct time_status_np *tsn;
-	struct port_stats_np *pcp;
-	struct tlv_extra *extra;
-	struct port_ds_np *pnp;
+	struct management_tlv_datum *mtd;
 	struct defaultDS *dds;
 	struct currentDS *cds;
 	struct parentDS *pds;
+	struct timePropertiesDS *tp;
+	struct time_status_np *tsn;
+	struct grandmaster_settings_np *gsn;
+	struct mgmt_clock_description *cd;
+	struct tlv_extra *extra;
 	struct portDS *p;
-	struct TLV *tlv;
-	int action;
+	struct port_ds_np *pnp;
 
-	if (msg_type(msg) == SIGNALING) {
-		pmc_show_signaling(msg, fp);
-		return;
-	}
 	if (msg_type(msg) != MANAGEMENT) {
 		return;
 	}
@@ -315,7 +224,7 @@ static void pmc_show(struct ptp_message *msg, FILE *fp)
 	case TLV_SLAVE_ONLY:
 		mtd = (struct management_tlv_datum *) mgt->data;
 		fprintf(fp, "SLAVE_ONLY "
-			IFMT "slaveOnly %d", mtd->val);
+			IFMT "slaveOnly %d", mtd->val & DDS_SLAVE_ONLY ? 1 : 0);
 		break;
 	case TLV_CLOCK_ACCURACY:
 		mtd = (struct management_tlv_datum *) mgt->data;
@@ -383,21 +292,6 @@ static void pmc_show(struct ptp_message *msg, FILE *fp)
 			gsn->time_flags & FREQ_TRACEABLE ? 1 : 0,
 			gsn->time_source);
 		break;
-	case TLV_SUBSCRIBE_EVENTS_NP:
-		sen = (struct subscribe_events_np *) mgt->data;
-		fprintf(fp, "SUBSCRIBE_EVENTS_NP "
-			IFMT "duration          %hu"
-			IFMT "NOTIFY_PORT_STATE %s"
-			IFMT "NOTIFY_TIME_SYNC  %s",
-			sen->duration,
-			event_bitmask_get(sen->bitmask, NOTIFY_PORT_STATE) ? "on" : "off",
-			event_bitmask_get(sen->bitmask, NOTIFY_TIME_SYNC) ? "on" : "off");
-		break;
-	case TLV_SYNCHRONIZATION_UNCERTAIN_NP:
-		mtd = (struct management_tlv_datum *) mgt->data;
-		fprintf(fp, "SYNCHRONIZATION_UNCERTAIN_NP "
-			IFMT "uncertain %hhu", mtd->val);
-		break;
 	case TLV_PORT_DATA_SET:
 		p = (struct portDS *) mgt->data;
 		if (p->portState > PS_SLAVE) {
@@ -413,13 +307,12 @@ static void pmc_show(struct ptp_message *msg, FILE *fp)
 			IFMT "logSyncInterval         %hhd"
 			IFMT "delayMechanism          %hhu"
 			IFMT "logMinPdelayReqInterval %hhd"
-			IFMT "versionNumber           %u",
+			IFMT "versionNumber           %hhu",
 			pid2str(&p->portIdentity), ps_str[p->portState],
 			p->logMinDelayReqInterval, p->peerMeanPathDelay >> 16,
 			p->logAnnounceInterval, p->announceReceiptTimeout,
 			p->logSyncInterval, p->delayMechanism,
-			p->logMinPdelayReqInterval,
-			p->versionNumber & MAJOR_VERSION_MASK);
+			p->logMinPdelayReqInterval, p->versionNumber);
 		break;
 	case TLV_PORT_DATA_SET_NP:
 		pnp = (struct port_ds_np *) mgt->data;
@@ -428,67 +321,6 @@ static void pmc_show(struct ptp_message *msg, FILE *fp)
 			IFMT "asCapable               %d",
 			pnp->neighborPropDelayThresh,
 			pnp->asCapable ? 1 : 0);
-		break;
-	case TLV_PORT_PROPERTIES_NP:
-		ppn = (struct port_properties_np *) mgt->data;
-		if (ppn->port_state > PS_SLAVE) {
-			ppn->port_state = 0;
-		}
-		fprintf(fp, "PORT_PROPERTIES_NP "
-			IFMT "portIdentity            %s"
-			IFMT "portState               %s"
-			IFMT "timestamping            %s"
-			IFMT "interface               %s",
-			pid2str(&ppn->portIdentity),
-			ps_str[ppn->port_state],
-			ts_str(ppn->timestamping),
-			text2str(&ppn->interface));
-		break;
-	case TLV_PORT_STATS_NP:
-		pcp = (struct port_stats_np *) mgt->data;
-		fprintf(fp, "PORT_STATS_NP "
-			IFMT "portIdentity              %s"
-			IFMT "rx_Sync                   %" PRIu64
-			IFMT "rx_Delay_Req              %" PRIu64
-			IFMT "rx_Pdelay_Req             %" PRIu64
-			IFMT "rx_Pdelay_Resp            %" PRIu64
-			IFMT "rx_Follow_Up              %" PRIu64
-			IFMT "rx_Delay_Resp             %" PRIu64
-			IFMT "rx_Pdelay_Resp_Follow_Up  %" PRIu64
-			IFMT "rx_Announce               %" PRIu64
-			IFMT "rx_Signaling              %" PRIu64
-			IFMT "rx_Management             %" PRIu64
-			IFMT "tx_Sync                   %" PRIu64
-			IFMT "tx_Delay_Req              %" PRIu64
-			IFMT "tx_Pdelay_Req             %" PRIu64
-			IFMT "tx_Pdelay_Resp            %" PRIu64
-			IFMT "tx_Follow_Up              %" PRIu64
-			IFMT "tx_Delay_Resp             %" PRIu64
-			IFMT "tx_Pdelay_Resp_Follow_Up  %" PRIu64
-			IFMT "tx_Announce               %" PRIu64
-			IFMT "tx_Signaling              %" PRIu64
-			IFMT "tx_Management             %" PRIu64,
-			pid2str(&pcp->portIdentity),
-			pcp->stats.rxMsgType[SYNC],
-			pcp->stats.rxMsgType[DELAY_REQ],
-			pcp->stats.rxMsgType[PDELAY_REQ],
-			pcp->stats.rxMsgType[PDELAY_RESP],
-			pcp->stats.rxMsgType[FOLLOW_UP],
-			pcp->stats.rxMsgType[DELAY_RESP],
-			pcp->stats.rxMsgType[PDELAY_RESP_FOLLOW_UP],
-			pcp->stats.rxMsgType[ANNOUNCE],
-			pcp->stats.rxMsgType[SIGNALING],
-			pcp->stats.rxMsgType[MANAGEMENT],
-			pcp->stats.txMsgType[SYNC],
-			pcp->stats.txMsgType[DELAY_REQ],
-			pcp->stats.txMsgType[PDELAY_REQ],
-			pcp->stats.txMsgType[PDELAY_RESP],
-			pcp->stats.txMsgType[FOLLOW_UP],
-			pcp->stats.txMsgType[DELAY_RESP],
-			pcp->stats.txMsgType[PDELAY_RESP_FOLLOW_UP],
-			pcp->stats.txMsgType[ANNOUNCE],
-			pcp->stats.txMsgType[SIGNALING],
-			pcp->stats.txMsgType[MANAGEMENT]);
 		break;
 	case TLV_LOG_ANNOUNCE_INTERVAL:
 		mtd = (struct management_tlv_datum *) mgt->data;
@@ -508,7 +340,7 @@ static void pmc_show(struct ptp_message *msg, FILE *fp)
 	case TLV_VERSION_NUMBER:
 		mtd = (struct management_tlv_datum *) mgt->data;
 		fprintf(fp, "VERSION_NUMBER "
-			IFMT "versionNumber %hhu", mtd->val & MAJOR_VERSION_MASK);
+			IFMT "versionNumber %hhu", mtd->val);
 		break;
 	case TLV_DELAY_MECHANISM:
 		mtd = (struct management_tlv_datum *) mgt->data;

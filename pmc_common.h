@@ -22,9 +22,14 @@
 #define HAVE_PMC_COMMON_H
 
 #include "config.h"
-#include "fsm.h"
 #include "msg.h"
 #include "transport.h"
+
+#define BAD_ACTION   -1
+#define BAD_ID       -1
+#define AMBIGUOUS_ID -2
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+#define P41 ((double)(1ULL << 41))
 
 struct pmc;
 

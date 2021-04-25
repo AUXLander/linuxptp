@@ -26,11 +26,24 @@
 #include "ds.h"
 #include "dm.h"
 #include "filter.h"
-#include "interface.h"
 #include "mtab.h"
 #include "transport.h"
 #include "servo.h"
 #include "sk.h"
+
+#define MAX_IFNAME_SIZE 108 /* = UNIX_PATH_MAX */
+
+#if (IF_NAMESIZE > MAX_IFNAME_SIZE)
+#error if_namesize larger than expected.
+#endif
+
+/** Defines a network interface, with PTP options. */
+struct interface {
+	STAILQ_ENTRY(interface) list;
+	char name[MAX_IFNAME_SIZE + 1];
+	char ts_label[MAX_IFNAME_SIZE + 1];
+	struct sk_ts_info ts_info;
+};
 
 struct config {
 	/* configured interfaces */
@@ -47,8 +60,8 @@ struct config {
 	STAILQ_HEAD(ucmtab_head, unicast_master_table) unicast_master_tables;
 };
 
-int config_read(const char *name, struct config *cfg);
-struct interface *config_create_interface(const char *name, struct config *cfg);
+int config_read(char *name, struct config *cfg);
+struct interface *config_create_interface(char *name, struct config *cfg);
 void config_destroy(struct config *cfg);
 
 /* New, hash table based methods: */

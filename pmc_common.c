@@ -18,21 +18,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #include <errno.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <stdlib.h>
 
-#include "notification.h"
 #include "print.h"
 #include "tlv.h"
 #include "transport.h"
+#include "util.h"
 #include "pmc_common.h"
-
-#define BAD_ACTION   -1
-#define BAD_ID       -1
-#define AMBIGUOUS_ID -2
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
 /*
    Field                  Len  Type
@@ -108,8 +101,6 @@ struct management_id idtab[] = {
 	{ "PRIMARY_DOMAIN", TLV_PRIMARY_DOMAIN, not_supported },
 	{ "TIME_STATUS_NP", TLV_TIME_STATUS_NP, do_get_action },
 	{ "GRANDMASTER_SETTINGS_NP", TLV_GRANDMASTER_SETTINGS_NP, do_set_action },
-	{ "SUBSCRIBE_EVENTS_NP", TLV_SUBSCRIBE_EVENTS_NP, do_set_action },
-	{ "SYNCHRONIZATION_UNCERTAIN_NP", TLV_SYNCHRONIZATION_UNCERTAIN_NP, do_set_action },
 /* Port management ID values */
 	{ "NULL_MANAGEMENT", TLV_NULL_MANAGEMENT, null_management },
 	{ "CLOCK_DESCRIPTION", TLV_CLOCK_DESCRIPTION, do_get_action },
@@ -129,8 +120,6 @@ struct management_id idtab[] = {
 	{ "DELAY_MECHANISM", TLV_DELAY_MECHANISM, do_get_action },
 	{ "LOG_MIN_PDELAY_REQ_INTERVAL", TLV_LOG_MIN_PDELAY_REQ_INTERVAL, do_get_action },
 	{ "PORT_DATA_SET_NP", TLV_PORT_DATA_SET_NP, do_set_action },
-	{ "PORT_STATS_NP", TLV_PORT_STATS_NP, do_get_action },
-	{ "PORT_PROPERTIES_NP", TLV_PORT_PROPERTIES_NP, do_get_action },
 };
 
 static void do_get_action(struct pmc *pmc, int action, int index, char *str)
@@ -143,14 +132,12 @@ static void do_get_action(struct pmc *pmc, int action, int index, char *str)
 
 static void do_set_action(struct pmc *pmc, int action, int index, char *str)
 {
-	int cnt, code = idtab[index].code, freq_traceable, leap_59, leap_61,
-		ptp_timescale, time_traceable, utc_off_valid;
 	struct grandmaster_settings_np gsn;
 	struct management_tlv_datum mtd;
-	struct subscribe_events_np sen;
 	struct port_ds_np pnp;
-	char onoff_port_state[4] = "off";
-	char onoff_time_status[4] = "off";
+	int cnt, code = idtab[index].code;
+	int leap_61, leap_59, utc_off_valid;
+	int ptp_timescale, time_traceable, freq_traceable;
 
 	switch (action) {
 	case GET:
@@ -220,49 +207,6 @@ static void do_set_action(struct pmc *pmc, int action, int index, char *str)
 		if (freq_traceable)
 			gsn.time_flags |= FREQ_TRACEABLE;
 		pmc_send_set_action(pmc, code, &gsn, sizeof(gsn));
-		break;
-	case TLV_SUBSCRIBE_EVENTS_NP:
-		memset(&sen, 0, sizeof(sen));
-		cnt = sscanf(str, " %*s %*s "
-			     "duration          %hu "
-			     "NOTIFY_PORT_STATE %3s "
-			     "NOTIFY_TIME_SYNC  %3s ",
-			     &sen.duration,
-			     onoff_port_state,
-			     onoff_time_status);
-		if (cnt != 3) {
-			fprintf(stderr, "%s SET needs 3 values\n",
-				idtab[index].name);
-			break;
-		}
-		if (!strcasecmp(onoff_port_state, "on")) {
-			event_bitmask_set(sen.bitmask, NOTIFY_PORT_STATE, TRUE);
-		}
-		if (!strcasecmp(onoff_time_status, "on")) {
-			event_bitmask_set(sen.bitmask, NOTIFY_TIME_SYNC, TRUE);
-		}
-		pmc_send_set_action(pmc, code, &sen, sizeof(sen));
-		break;
-	case TLV_SYNCHRONIZATION_UNCERTAIN_NP:
-		cnt = sscanf(str,  " %*s %*s %hhu", &mtd.val);
-		if (cnt != 1) {
-			fprintf(stderr, "%s SET needs 1 value\n",
-				idtab[index].name);
-			break;
-		}
-		switch (mtd.val) {
-		case SYNC_UNCERTAIN_DONTCARE:
-		case SYNC_UNCERTAIN_FALSE:
-		case SYNC_UNCERTAIN_TRUE:
-			pmc_send_set_action(pmc, code, &mtd, sizeof(mtd));
-			break;
-		default:
-			fprintf(stderr, "\nusage: set SYNCHRONIZATION_UNCERTAIN_NP "
-				"%hhu (false), %hhu (true), or %hhu (don't care)\n\n",
-				SYNC_UNCERTAIN_FALSE,
-				SYNC_UNCERTAIN_TRUE,
-				SYNC_UNCERTAIN_DONTCARE);
-		}
 		break;
 	case TLV_PORT_DATA_SET_NP:
 		cnt = sscanf(str, " %*s %*s "
@@ -367,7 +311,6 @@ struct pmc {
 	struct PortIdentity target;
 
 	struct transport *transport;
-	struct interface *iface;
 	struct fdarray fdarray;
 	int zero_length_gets;
 };
@@ -377,22 +320,22 @@ struct pmc *pmc_create(struct config *cfg, enum transport_type transport_type,
 		       UInteger8 domain_number, UInteger8 transport_specific,
 		       int zero_datalen)
 {
+	struct interface iface;
 	struct pmc *pmc;
+
+	memset(&iface, 0, sizeof(iface));
 
 	pmc = calloc(1, sizeof *pmc);
 	if (!pmc)
 		return NULL;
 
-	if (transport_type == TRANS_UDS) {
-		pmc->port_identity.portNumber = getpid();
-	} else {
-		if (generate_clock_identity(&pmc->port_identity.clockIdentity,
-					    iface_name)) {
-			pr_err("failed to generate a clock identity");
-			goto failed;
-		}
-		pmc->port_identity.portNumber = 1;
+	if (transport_type != TRANS_UDS &&
+	    generate_clock_identity(&pmc->port_identity.clockIdentity,
+				    iface_name)) {
+		pr_err("failed to generate a clock identity");
+		goto failed;
 	}
+	pmc->port_identity.portNumber = 1;
 	pmc_target_all(pmc);
 
 	pmc->boundary_hops = boundary_hops;
@@ -405,24 +348,20 @@ struct pmc *pmc_create(struct config *cfg, enum transport_type transport_type,
 		goto failed;
 	}
 
-	pmc->iface = interface_create(iface_name);
-	if (!pmc->iface) {
-		pr_err("failed to create interface");
-		goto failed;
+	strncpy(iface.name, iface_name, MAX_IFNAME_SIZE);
+	if (iface.ts_label[0] == '\0') {
+		strncpy(iface.ts_label, iface.name, MAX_IFNAME_SIZE);
 	}
-	interface_ensure_tslabel(pmc->iface);
 
-	if (transport_open(pmc->transport, pmc->iface,
+	if (transport_open(pmc->transport, &iface,
 			   &pmc->fdarray, TS_SOFTWARE)) {
 		pr_err("failed to open transport");
-		goto no_trans_open;
+		goto failed;
 	}
 	pmc->zero_length_gets = zero_datalen ? 1 : 0;
 
 	return pmc;
 
-no_trans_open:
-	interface_destroy(pmc->iface);
 failed:
 	if (pmc->transport)
 		transport_destroy(pmc->transport);
@@ -433,7 +372,6 @@ failed:
 void pmc_destroy(struct pmc *pmc)
 {
 	transport_close(pmc->transport, &pmc->fdarray);
-	interface_destroy(pmc->iface);
 	transport_destroy(pmc->transport);
 	free(pmc);
 }
@@ -608,7 +546,6 @@ int pmc_send_set_action(struct pmc *pmc, int id, void *data, int datasize)
 	}
 	extra = msg_tlv_append(msg, sizeof(*mgt) + datasize);
 	if (!extra) {
-		msg_put(msg);
 		return -ENOMEM;
 	}
 	mgt = (struct management_tlv *) extra->tlv;

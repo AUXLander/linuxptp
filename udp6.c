@@ -39,19 +39,14 @@
 
 #define EVENT_PORT        319
 #define GENERAL_PORT      320
-
-/* The 0x0e in second byte is substituted with udp6_scope at runtime. */
 #define PTP_PRIMARY_MCAST_IP6ADDR "FF0E:0:0:0:0:0:0:181"
 #define PTP_PDELAY_MCAST_IP6ADDR  "FF02:0:0:0:0:0:0:6B"
-
-enum { MC_PRIMARY, MC_PDELAY };
 
 struct udp6 {
 	struct transport t;
 	int index;
 	struct address ip;
 	struct address mac;
-	struct in6_addr mc6_addr[2];
 };
 
 static int is_link_local(struct in6_addr *addr)
@@ -160,13 +155,17 @@ no_socket:
 	return -1;
 }
 
+enum { MC_PRIMARY, MC_PDELAY };
+
+static struct in6_addr mc6_addr[2];
+
 static int udp6_open(struct transport *t, struct interface *iface,
 		     struct fdarray *fda, enum timestamp_type ts_type)
 {
 	struct udp6 *udp6 = container_of(t, struct udp6, t);
-	const char *name = interface_name(iface);
 	uint8_t event_dscp, general_dscp;
 	int efd, gfd, hop_limit;
+	char *name = iface->name;
 
 	hop_limit = config_get_int(t->cfg, name, "udp_ttl");
 	udp6->mac.len = 0;
@@ -175,28 +174,23 @@ static int udp6_open(struct transport *t, struct interface *iface,
 	udp6->ip.len = 0;
 	sk_interface_addr(name, AF_INET6, &udp6->ip);
 
-	if (1 != inet_pton(AF_INET6, PTP_PRIMARY_MCAST_IP6ADDR,
-			   &udp6->mc6_addr[MC_PRIMARY]))
+	if (1 != inet_pton(AF_INET6, PTP_PRIMARY_MCAST_IP6ADDR, &mc6_addr[MC_PRIMARY]))
 		return -1;
 
-	udp6->mc6_addr[MC_PRIMARY].s6_addr[1] = config_get_int(t->cfg, name,
-							       "udp6_scope");
+	mc6_addr[MC_PRIMARY].s6_addr[1] = config_get_int(t->cfg, name, "udp6_scope");
 
-	if (1 != inet_pton(AF_INET6, PTP_PDELAY_MCAST_IP6ADDR,
-			   &udp6->mc6_addr[MC_PDELAY]))
+	if (1 != inet_pton(AF_INET6, PTP_PDELAY_MCAST_IP6ADDR, &mc6_addr[MC_PDELAY]))
 		return -1;
 
-	efd = open_socket_ipv6(name, udp6->mc6_addr, EVENT_PORT, &udp6->index,
-			       hop_limit);
+	efd = open_socket_ipv6(name, mc6_addr, EVENT_PORT, &udp6->index, hop_limit);
 	if (efd < 0)
 		goto no_event;
 
-	gfd = open_socket_ipv6(name, udp6->mc6_addr, GENERAL_PORT, &udp6->index,
-			       hop_limit);
+	gfd = open_socket_ipv6(name, mc6_addr, GENERAL_PORT, &udp6->index, hop_limit);
 	if (gfd < 0)
 		goto no_general;
 
-	if (sk_timestamping_init(efd, interface_label(iface), ts_type, TRANS_UDP_IPV6))
+	if (sk_timestamping_init(efd, iface->ts_label, ts_type, TRANS_UDP_IPV6))
 		goto no_timestamping;
 
 	if (sk_general_init(gfd))
@@ -205,10 +199,10 @@ static int udp6_open(struct transport *t, struct interface *iface,
 	event_dscp = config_get_int(t->cfg, NULL, "dscp_event");
 	general_dscp = config_get_int(t->cfg, NULL, "dscp_general");
 
-	if (event_dscp && sk_set_priority(efd, AF_INET6, event_dscp)) {
+	if (event_dscp && sk_set_priority(efd, event_dscp)) {
 		pr_warning("Failed to set event DSCP priority.");
 	}
-	if (general_dscp && sk_set_priority(gfd, AF_INET6, general_dscp)) {
+	if (general_dscp && sk_set_priority(gfd, general_dscp)) {
 		pr_warning("Failed to set general DSCP priority.");
 	}
 
@@ -227,7 +221,7 @@ no_event:
 static int udp6_recv(struct transport *t, int fd, void *buf, int buflen,
 		     struct address *addr, struct hw_timestamp *hwts)
 {
-	return sk_receive(fd, buf, buflen, addr, hwts, MSG_DONTWAIT);
+	return sk_receive(fd, buf, buflen, addr, hwts, 0);
 }
 
 static int udp6_send(struct transport *t, struct fdarray *fda,
@@ -255,8 +249,8 @@ static int udp6_send(struct transport *t, struct fdarray *fda,
 	if (!addr) {
 		memset(&addr_buf, 0, sizeof(addr_buf));
 		addr_buf.sin6.sin6_family = AF_INET6;
-		addr_buf.sin6.sin6_addr =  peer ? udp6->mc6_addr[MC_PDELAY] :
-						  udp6->mc6_addr[MC_PRIMARY];
+		addr_buf.sin6.sin6_addr =  peer ? mc6_addr[MC_PDELAY] :
+						  mc6_addr[MC_PRIMARY];
 		if (is_link_local(&addr_buf.sin6.sin6_addr))
 			addr_buf.sin6.sin6_scope_id = udp6->index;
 
@@ -271,7 +265,7 @@ static int udp6_send(struct transport *t, struct fdarray *fda,
 	cnt = sendto(fd, buf, len, 0, &addr->sa, sizeof(addr->sin6));
 	if (cnt < 1) {
 		pr_err("sendto failed: %m");
-		return -errno;
+		return cnt;
 	}
 	/*
 	 * Get the time stamp right away.

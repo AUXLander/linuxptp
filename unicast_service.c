@@ -209,9 +209,9 @@ static void unicast_service_extend(struct unicast_client_address *client,
 	tmo = now.tv_sec + req->durationField;
 	if (tmo > client->grant_tmo) {
 		client->grant_tmo = tmo;
-		pr_debug("%s grant of 0x%x extended to %lld",
+		pr_debug("%s grant of 0x%x extended to %ld",
 			 pid2str(&client->portIdentity),
-			 client->message_types, (long long)tmo);
+			 client->message_types, tmo);
 	}
 }
 
@@ -226,8 +226,8 @@ static int unicast_service_rearm_timer(struct port *p)
 	interval = pqueue_peek(p->unicast_service->queue);
 	if (interval) {
 		tmo.it_value = interval->tmo;
-		pr_debug("arming timer tmo={%lld,%ld}",
-			 (long long)interval->tmo.tv_sec, interval->tmo.tv_nsec);
+		pr_debug("arming timer tmo={%ld,%ld}",
+			 interval->tmo.tv_sec, interval->tmo.tv_nsec);
 	} else {
 		pr_debug("stopping unicast service timer");
 	}
@@ -241,8 +241,8 @@ static int unicast_service_reply(struct port *p, struct ptp_message *dst,
 	struct ptp_message *msg;
 	int err;
 
-	msg = port_signaling_uc_construct(p, &dst->address,
-					  &dst->header.sourcePortIdentity);
+	msg = port_signaling_construct(p, &dst->address,
+				       &dst->header.sourcePortIdentity);
 	if (!msg) {
 		return -1;
 	}
@@ -252,7 +252,7 @@ static int unicast_service_reply(struct port *p, struct ptp_message *dst,
 	}
 	err = port_prepare_and_send(p, msg, TRANS_GENERAL);
 	if (err) {
-		pr_err("%s: signaling message failed", p->log_name);
+		pr_err("port %hu: signaling message failed", portnum(p));
 	}
 out:
 	msg_put(msg);
@@ -499,10 +499,10 @@ int unicast_service_timer(struct port *p)
 
 	while ((interval = pqueue_peek(p->unicast_service->queue)) != NULL) {
 
-		pr_debug("peek i={2^%d} tmo={%lld,%ld}", interval->log_period,
-			 (long long)interval->tmo.tv_sec, interval->tmo.tv_nsec);
+		pr_debug("peek i={2^%d} tmo={%ld,%ld}", interval->log_period,
+			 interval->tmo.tv_sec, interval->tmo.tv_nsec);
 
-		if (timespec_compare(&now, &interval->tmo) > 0) {
+		if (timespec_compare(&now, &interval->tmo) >= 0) {
 			break;
 		}
 		interval = pqueue_extract(p->unicast_service->queue);
@@ -519,8 +519,8 @@ int unicast_service_timer(struct port *p)
 		}
 
 		interval_increment(interval);
-		pr_debug("next i={2^%d} tmo={%lld,%ld}", interval->log_period,
-			 (long long)interval->tmo.tv_sec, interval->tmo.tv_nsec);
+		pr_debug("next i={2^%d} tmo={%ld,%ld}", interval->log_period,
+			 interval->tmo.tv_sec, interval->tmo.tv_nsec);
 		pqueue_insert(p->unicast_service->queue, interval);
 	}
 

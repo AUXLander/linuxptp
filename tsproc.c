@@ -20,7 +20,6 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#include "kalman.h"
 #include "tsproc.h"
 #include "filter.h"
 #include "print.h"
@@ -130,11 +129,7 @@ tmv_t get_raw_delay(struct tsproc *tsp)
 
 	t23 = tmv_sub(tsp->t2, tsp->t3);
 	if (tsp->clock_rate_ratio != 1.0)
-	{
-		pr_notice("rr = %.9f", tsp->clock_rate_ratio);
 		t23 = dbl_tmv(tmv_dbl(t23) * tsp->clock_rate_ratio);
-	}
-		
 	t41 = tmv_sub(tsp->t4, tsp->t1);
 	delay = tmv_div(tmv_add(t23, t41), 2);
 
@@ -215,8 +210,7 @@ int tsproc_update_offset(struct tsproc *tsp, tmv_t *offset, double *weight)
 	}
 
 	/* offset = t2 - t1 - delay */
-
-	*offset = filter_update(tsp->delay_filter, tmv_sub(tmv_sub(tsp->t2, tsp->t1), delay));
+	*offset = tmv_sub(tmv_sub(tsp->t2, tsp->t1), delay);
 
 	if (!weight)
 		return 0;

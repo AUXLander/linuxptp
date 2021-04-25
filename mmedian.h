@@ -20,7 +20,6 @@
 #ifndef HAVE_MMEDIAN_H
 #define HAVE_MMEDIAN_H
 
-#include "print.h"
 #include "filter.h"
 
 struct filter *mmedian_create(int length);

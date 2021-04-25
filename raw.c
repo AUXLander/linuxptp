@@ -150,7 +150,7 @@ static int raw_close(struct transport *t, struct fdarray *fda)
 }
 
 static int open_socket(const char *name, int event, unsigned char *ptp_dst_mac,
-		       unsigned char *p2p_dst_mac, int socket_priority)
+		       unsigned char *p2p_dst_mac)
 {
 	struct sockaddr_ll addr;
 	int fd, index;
@@ -174,13 +174,6 @@ static int open_socket(const char *name, int event, unsigned char *ptp_dst_mac,
 	}
 	if (setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, name, strlen(name))) {
 		pr_err("setsockopt SO_BINDTODEVICE failed: %m");
-		goto no_option;
-	}
-
-	if (socket_priority > 0 &&
-	    setsockopt(fd, SOL_SOCKET, SO_PRIORITY, &socket_priority,
-		       sizeof(socket_priority))) {
-		pr_err("setsockopt SO_PRIORITY failed: %m");
 		goto no_option;
 	}
 	if (raw_configure(fd, event, index, ptp_dst_mac, p2p_dst_mac, 1))
@@ -212,11 +205,10 @@ static int raw_open(struct transport *t, struct interface *iface,
 	struct raw *raw = container_of(t, struct raw, t);
 	unsigned char ptp_dst_mac[MAC_LEN];
 	unsigned char p2p_dst_mac[MAC_LEN];
-	int efd, gfd, socket_priority;
-	const char *name;
-	char *str;
+	int efd, gfd;
+	char *str, *name;
 
-	name = interface_label(iface);
+	name = iface->ts_label;
 	str = config_get_string(t->cfg, name, "ptp_dst_mac");
 	if (str2mac(str, ptp_dst_mac)) {
 		pr_err("invalid ptp_dst_mac %s", str);
@@ -233,13 +225,11 @@ static int raw_open(struct transport *t, struct interface *iface,
 	if (sk_interface_macaddr(name, &raw->src_addr))
 		goto no_mac;
 
-	socket_priority = config_get_int(t->cfg, "global", "socket_priority");
-
-	efd = open_socket(name, 1, ptp_dst_mac, p2p_dst_mac, socket_priority);
+	efd = open_socket(name, 1, ptp_dst_mac, p2p_dst_mac);
 	if (efd < 0)
 		goto no_event;
 
-	gfd = open_socket(name, 0, ptp_dst_mac, p2p_dst_mac, socket_priority);
+	gfd = open_socket(name, 0, ptp_dst_mac, p2p_dst_mac);
 	if (gfd < 0)
 		goto no_general;
 
@@ -279,7 +269,7 @@ static int raw_recv(struct transport *t, int fd, void *buf, int buflen,
 	buflen += hlen;
 	hdr = (struct eth_hdr *) ptr;
 
-	cnt = sk_receive(fd, ptr, buflen, addr, hwts, MSG_DONTWAIT);
+	cnt = sk_receive(fd, ptr, buflen, addr, hwts, 0);
 
 	if (cnt >= 0)
 		cnt -= hlen;
@@ -336,7 +326,8 @@ static int raw_send(struct transport *t, struct fdarray *fda,
 
 	cnt = send(fd, ptr, len, 0);
 	if (cnt < 1) {
-		return -errno;
+		pr_err("send failed: %d %m", errno);
+		return cnt;
 	}
 	/*
 	 * Get the time stamp right away.

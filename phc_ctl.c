@@ -110,6 +110,39 @@ static int64_t calculate_offset(struct timespec *ts1,
 	return offset;
 }
 
+static clockid_t clock_open(char *device)
+{
+	struct sk_ts_info ts_info;
+	char phc_device[19];
+	int clkid;
+
+	/* check if device is CLOCK_REALTIME */
+	if (!strcasecmp(device, "CLOCK_REALTIME"))
+		return CLOCK_REALTIME;
+
+	/* check if device is valid phc device */
+	clkid = phc_open(device);
+	if (clkid != CLOCK_INVALID)
+		return clkid;
+
+	/* check if device is a valid ethernet device */
+	if (sk_get_ts_info(device, &ts_info) || !ts_info.valid) {
+		pr_err("unknown clock %s: %m", device);
+		return CLOCK_INVALID;
+	}
+
+	if (ts_info.phc_index < 0) {
+		pr_err("interface %s does not have a PHC", device);
+		return CLOCK_INVALID;
+	}
+
+	sprintf(phc_device, "/dev/ptp%d", ts_info.phc_index);
+	clkid = phc_open(phc_device);
+	if (clkid == CLOCK_INVALID)
+		pr_err("cannot open %s for %s: %m", phc_device, device);
+	return clkid;
+}
+
 static void usage(const char *progname)
 {
 	fprintf(stderr,
@@ -197,8 +230,8 @@ static int do_set(clockid_t clkid, int cmdc, char *cmdv[])
 			strerror(errno));
 		return -1;
 	} else {
-		pr_notice("set clock time to %lld.%09ld or %s",
-			(long long)ts.tv_sec, ts.tv_nsec, ctime(&ts.tv_sec));
+		pr_notice("set clock time to %ld.%09ld or %s",
+			ts.tv_sec, ts.tv_nsec, ctime(&ts.tv_sec));
 	}
 
 	return args_to_eat;
@@ -215,8 +248,8 @@ static int do_get(clockid_t clkid, int cmdc, char *cmdv[])
 
 		return -1;
 	} else {
-		pr_notice("clock time is %lld.%09lu or %s",
-			(long long)ts.tv_sec, ts.tv_nsec, ctime(&ts.tv_sec));
+		pr_notice("clock time is %ld.%09lu or %s",
+			ts.tv_sec, ts.tv_nsec, ctime(&ts.tv_sec));
 	}
 
 	/* get operation does not require any arguments */
@@ -320,16 +353,12 @@ static int do_caps(clockid_t clkid, int cmdc, char *cmdv[])
 		"  %d programable alarms\n"
 		"  %d external time stamp channels\n"
 		"  %d programmable periodic signals\n"
-		"  %d configurable input/output pins\n"
-		"  %s pulse per second support\n"
-		"  %s cross timestamping support\n",
+		"  %s pulse per second support",
 		caps.max_adj,
 		caps.n_alarm,
 		caps.n_ext_ts,
 		caps.n_per_out,
-		caps.n_pins,
-		caps.pps ? "has" : "doesn't have",
-		caps.cross_timestamping ? "has" : "doesn't have");
+		caps.pps ? "has" : "doesn't have");
 	return 0;
 }
 
@@ -338,20 +367,18 @@ static int do_cmp(clockid_t clkid, int cmdc, char *cmdv[])
 	struct timespec ts, rta, rtb;
 	int64_t sys_offset, delay = 0, offset;
 	uint64_t sys_ts;
-	int method;
 
-	method = sysoff_probe(CLOCKID_TO_FD(clkid), 9);
-
-	if (method >= 0 && sysoff_measure(CLOCKID_TO_FD(clkid), method, 9,
-					  &sys_offset, &sys_ts, &delay) >= 0) {
+	if (SYSOFF_SUPPORTED ==
+	    sysoff_measure(CLOCKID_TO_FD(clkid),
+			   9, &sys_offset, &sys_ts, &delay)) {
 		pr_notice( "offset from CLOCK_REALTIME is %"PRId64"ns\n",
 			sys_offset);
 		return 0;
 	}
 
 	memset(&ts, 0, sizeof(ts));
-	memset(&rta, 0, sizeof(rta));
-	memset(&rtb, 0, sizeof(rtb));
+	memset(&ts, 0, sizeof(rta));
+	memset(&ts, 0, sizeof(rtb));
 	if (clock_gettime(CLOCK_REALTIME, &rta) ||
 	    clock_gettime(clkid, &ts) ||
 	    clock_gettime(CLOCK_REALTIME, &rtb)) {
@@ -474,10 +501,10 @@ static int run_cmds(clockid_t clkid, int cmdc, char *cmdv[])
 
 int main(int argc, char *argv[])
 {
-	int c, cmdc, junk, print_level = LOG_INFO, result;
-	char **cmdv, *default_cmdv[] = { "caps" };
-	int use_syslog = 1, verbose = 1;
 	const char *progname;
+	char **cmdv, *default_cmdv[] = { "caps" };
+	int c, result, cmdc;
+	int print_level = LOG_INFO, verbose = 1, use_syslog = 1;
 	clockid_t clkid;
 
 	install_handler(SIGALRM, handle_alarm);
@@ -529,13 +556,12 @@ int main(int argc, char *argv[])
 		cmdc = argc - optind - 1;
 	}
 
-	clkid = posix_clock_open(argv[optind], &junk);
+	clkid = clock_open(argv[optind]);
 	if (clkid == CLOCK_INVALID)
 		return -1;
 
 	/* pass the remaining arguments to the run_cmds loop */
 	result = run_cmds(clkid, cmdc, cmdv);
-	posix_clock_close(clkid);
 	if (result < -1) {
 		/* show usage when command fails */
 		usage(progname);

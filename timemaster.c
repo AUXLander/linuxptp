@@ -22,7 +22,6 @@
 #include <errno.h>
 #include <libgen.h>
 #include <limits.h>
-#include <time.h>
 #include <linux/net_tstamp.h>
 #include <net/if.h>
 #include <signal.h>
@@ -406,23 +405,6 @@ static int parse_timemaster_settings(char **settings,
 	return 0;
 }
 
-static char **parse_raw_settings(char **settings)
-{
-	char **setting, *s, **parsed_settings;
-
-	parsed_settings = (char **)parray_new();
-
-	for (setting = settings; *setting; setting++) {
-		s = *setting;
-		/* Unescape lines beginning with '>' */
-		if (s[0] == '>')
-			s++;
-		parray_append((void ***)&parsed_settings, xstrdup(s));
-	}
-
-	return parsed_settings;
-}
-
 static int parse_section(char **settings, char *name,
 			 struct timemaster_config *config)
 {
@@ -469,7 +451,8 @@ static int parse_section(char **settings, char *name,
 
 	if (settings_dst) {
 		free_parray((void **)*settings_dst);
-		*settings_dst = parse_raw_settings(settings);
+		*settings_dst = (char **)parray_new();
+		extend_string_array(settings_dst, settings);
 	}
 
 	return 0;
@@ -712,7 +695,7 @@ static int add_ptp_source(struct ptp_domain *source,
 			  char **ntp_config, struct script *script)
 {
 	struct config_file *config_file;
-	char **command, *uds_path, *uds_path2, **interfaces, *message_tag;
+	char **command, *uds_path, **interfaces, *message_tag;
 	char ts_interface[IF_NAMESIZE];
 	int i, j, num_interfaces, *phc, *phcs, hw_ts, sw_ts;
 	struct sk_ts_info ts_info;
@@ -809,8 +792,6 @@ static int add_ptp_source(struct ptp_domain *source,
 
 		uds_path = string_newf("%s/ptp4l.%d.socket",
 				       config->rundir, *shm_segment);
-		uds_path2 = string_newf("%s/ptp4lro.%d.socket",
-					config->rundir, *shm_segment);
 
 		message_tag = string_newf("[%d", source->domain);
 		for (j = 0; interfaces[j]; j++)
@@ -821,23 +802,17 @@ static int add_ptp_source(struct ptp_domain *source,
 		config_file = xmalloc(sizeof(*config_file));
 		config_file->path = string_newf("%s/ptp4l.%d.conf",
 						config->rundir, *shm_segment);
-
 		config_file->content = xstrdup("[global]\n");
-		if (*config->ptp4l.settings) {
-			extend_config_string(&config_file->content,
-					     config->ptp4l.settings);
-			string_appendf(&config_file->content, "\n[global]\n");
-		}
+		extend_config_string(&config_file->content,
+				     config->ptp4l.settings);
 		extend_config_string(&config_file->content,
 				     source->ptp4l_settings);
 		string_appendf(&config_file->content,
-			       "clientOnly 1\n"
+			       "slaveOnly 1\n"
 			       "domainNumber %d\n"
 			       "uds_address %s\n"
-			       "uds_ro_address %s\n"
 			       "message_tag %s\n",
-			       source->domain, uds_path, uds_path2,
-			       message_tag);
+			       source->domain, uds_path, message_tag);
 
 		if (phcs[i] >= 0) {
 			/* HW time stamping */
@@ -872,7 +847,6 @@ static int add_ptp_source(struct ptp_domain *source,
 
 		free(message_tag);
 		free(uds_path);
-		free(uds_path2);
 		free(interfaces);
 	}
 

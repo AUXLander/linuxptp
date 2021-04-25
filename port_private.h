@@ -21,10 +21,8 @@
 
 #include <sys/queue.h>
 
-#include "as_capable.h"
 #include "clock.h"
 #include "fsm.h"
-#include "monitor.h"
 #include "msg.h"
 #include "tmv.h"
 
@@ -61,8 +59,7 @@ struct tc_txd {
 
 struct port {
 	LIST_ENTRY(port) list;
-	const char *name;
-	char *log_name;
+	char *name;
 	struct interface *iface;
 	struct clock *clock;
 	struct transport *trp;
@@ -70,7 +67,6 @@ struct port {
 	struct fdarray fda;
 	int fault_fd;
 	int phc_index;
-	int phc_from_cmdline;
 
 	void (*dispatch)(struct port *p, enum fsm_event event, int mdiff);
 	enum fsm_event (*event)(struct port *p, int fd_index);
@@ -100,38 +96,28 @@ struct port {
 	unsigned int multiple_pdr_detected;
 	enum port_state (*state_machine)(enum port_state state,
 					 enum fsm_event event, int mdiff);
-	int bmca;
-	int inhibit_announce;
-	int ignore_source_id;
-	int inhibit_delay_req;
 	/* portDS */
 	struct PortIdentity portIdentity;
 	enum port_state     state; /*portState*/
 	Integer64           asymmetry;
-	enum as_capable     asCapable;
+	int                 asCapable;
 	Integer8            logMinDelayReqInterval;
 	TimeInterval        peerMeanPathDelay;
-	Integer8            initialLogAnnounceInterval;
 	Integer8            logAnnounceInterval;
 	UInteger8           announceReceiptTimeout;
 	int                 announce_span;
 	UInteger8           syncReceiptTimeout;
 	UInteger8           transportSpecific;
 	UInteger8           localPriority;
-	Integer8            initialLogSyncInterval;
-	Integer8	    operLogSyncInterval;
 	Integer8            logSyncInterval;
 	Enumeration8        delayMechanism;
 	Integer8            logMinPdelayReqInterval;
-	Integer8            operLogPdelayReqInterval;
-	Integer8            logPdelayReqInterval;
 	UInteger32          neighborPropDelayThresh;
 	int                 follow_up_info;
 	int                 freq_est_interval;
 	int                 hybrid_e2e;
 	int                 master_only;
 	int                 match_transport_specific;
-	int                 msg_interval_request;
 	int                 min_neighbor_prop_delay;
 	int                 net_sync_monitor;
 	int                 path_trace_enabled;
@@ -142,8 +128,7 @@ struct port {
 	enum link_state     link_status;
 	struct fault_interval flt_interval_pertype[FT_CNT];
 	enum fault_type     last_fault_type;
-	UInteger8           versionNumber; /* UInteger4 */
-	struct PortStats    stats;
+	unsigned int        versionNumber; /*UInteger4*/
 	/* foreignMasterDS */
 	LIST_HEAD(fm, foreign_clock) foreign_masters;
 	/* TC book keeping */
@@ -153,8 +138,6 @@ struct port {
 	/* unicast service mode */
 	struct unicast_service *unicast_service;
 	int inhibit_multicast_service;
-	/* slave event monitoring */
-	struct monitor *slave_event_monitor;
 };
 
 #define portnum(p) (p->portIdentity.portNumber)
@@ -170,7 +153,6 @@ void delay_req_prune(struct port *p);
 void fc_clear(struct foreign_clock *fc);
 void flush_delay_req(struct port *p);
 void flush_last_sync(struct port *p);
-int port_capable(struct port *p);
 int port_clr_tmo(int fd);
 int port_delay_request(struct port *p);
 void port_disable(struct port *p);
@@ -182,14 +164,10 @@ int port_set_delay_tmo(struct port *p);
 int port_set_qualification_tmo(struct port *p);
 void port_show_transition(struct port *p, enum port_state next,
 			  enum fsm_event event);
-struct ptp_message *port_signaling_uc_construct(struct port *p,
-						struct address *address,
-						struct PortIdentity *tpid);
+struct ptp_message *port_signaling_construct(struct port *p,
+					     struct address *address,
+					     struct PortIdentity *tpid);
 int port_tx_announce(struct port *p, struct address *dst);
-int port_tx_interval_request(struct port *p,
-			     Integer8 announceInterval,
-			     Integer8 timeSyncInterval,
-			     Integer8 linkDelayInterval);
 int port_tx_sync(struct port *p, struct address *dst);
 int process_announce(struct port *p, struct ptp_message *m);
 void process_delay_resp(struct port *p, struct ptp_message *m);

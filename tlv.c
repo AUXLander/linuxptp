@@ -18,7 +18,6 @@
  */
 #include <arpa/inet.h>
 #include <errno.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -42,32 +41,18 @@ static TAILQ_HEAD(tlv_pool, tlv_extra) tlv_pool =
 static void scaled_ns_n2h(ScaledNs *sns)
 {
 	sns->nanoseconds_msb = ntohs(sns->nanoseconds_msb);
-	sns->nanoseconds_lsb = net2host64(sns->nanoseconds_lsb);
+	sns->nanoseconds_lsb = net2host64(sns->nanoseconds_msb);
 	sns->fractional_nanoseconds = ntohs(sns->fractional_nanoseconds);
 }
 
 static void scaled_ns_h2n(ScaledNs *sns)
 {
 	sns->nanoseconds_msb = htons(sns->nanoseconds_msb);
-	sns->nanoseconds_lsb = host2net64(sns->nanoseconds_lsb);
+	sns->nanoseconds_lsb = host2net64(sns->nanoseconds_msb);
 	sns->fractional_nanoseconds = htons(sns->fractional_nanoseconds);
 }
 
-static void timestamp_host2net(struct Timestamp *t)
-{
-	HTONL(t->seconds_lsb);
-	HTONS(t->seconds_msb);
-	HTONL(t->nanoseconds);
-}
-
-static void timestamp_net2host(struct Timestamp *t)
-{
-	NTOHL(t->seconds_lsb);
-	NTOHS(t->seconds_msb);
-	NTOHL(t->nanoseconds);
-}
-
-static uint16_t flip16(void *p)
+static uint16_t flip16(uint16_t *p)
 {
 	uint16_t v;
 	memcpy(&v, p, sizeof(v));
@@ -76,7 +61,7 @@ static uint16_t flip16(void *p)
 	return v;
 }
 
-static int64_t host2net64_unaligned(void *p)
+static int64_t host2net64_unaligned(int64_t *p)
 {
 	int64_t v;
 	memcpy(&v, p, sizeof(v));
@@ -85,29 +70,13 @@ static int64_t host2net64_unaligned(void *p)
 	return v;
 }
 
-static int64_t net2host64_unaligned(void *p)
+static int64_t net2host64_unaligned(int64_t *p)
 {
 	int64_t v;
 	memcpy(&v, p, sizeof(v));
 	v = net2host64(v);
 	memcpy(p, &v, sizeof(v));
 	return v;
-}
-
-static size_t tlv_array_count(struct TLV *tlv, size_t base_size, size_t item_size)
-{
-	return (tlv->length - base_size) / item_size;
-}
-
-static bool tlv_array_invalid(struct TLV *tlv, size_t base_size, size_t item_size)
-{
-	size_t expected_length, n_items;
-
-	n_items = tlv_array_count(tlv, base_size, item_size);
-
-	expected_length = base_size + n_items * item_size;
-
-	return (tlv->length == expected_length) ? false : true;
 }
 
 static int mgt_post_recv(struct management_tlv *m, uint16_t data_len,
@@ -123,7 +92,6 @@ static int mgt_post_recv(struct management_tlv *m, uint16_t data_len,
 	struct grandmaster_settings_np *gsn;
 	struct subscribe_events_np *sen;
 	struct port_properties_np *ppn;
-	struct port_stats_np *psn;
 	struct mgmt_clock_description *cd;
 	int extra_len = 0, len;
 	uint8_t *buf;
@@ -318,14 +286,6 @@ static int mgt_post_recv(struct management_tlv *m, uint16_t data_len,
 		extra_len = sizeof(struct port_properties_np);
 		extra_len += ppn->interface.length;
 		break;
-	case TLV_PORT_STATS_NP:
-		if (data_len < sizeof(struct port_stats_np))
-			goto bad_length;
-		psn = (struct port_stats_np *)m->data;
-		psn->portIdentity.portNumber =
-			ntohs(psn->portIdentity.portNumber);
-		extra_len = sizeof(struct port_stats_np);
-		break;
 	case TLV_SAVE_IN_NON_VOLATILE_STORAGE:
 	case TLV_RESET_NON_VOLATILE_STORAGE:
 	case TLV_INITIALIZE:
@@ -359,7 +319,6 @@ static void mgt_pre_send(struct management_tlv *m, struct tlv_extra *extra)
 	struct grandmaster_settings_np *gsn;
 	struct subscribe_events_np *sen;
 	struct port_properties_np *ppn;
-	struct port_stats_np *psn;
 	struct mgmt_clock_description *cd;
 	switch (m->id) {
 	case TLV_CLOCK_DESCRIPTION:
@@ -431,11 +390,6 @@ static void mgt_pre_send(struct management_tlv *m, struct tlv_extra *extra)
 	case TLV_PORT_PROPERTIES_NP:
 		ppn = (struct port_properties_np *)m->data;
 		ppn->portIdentity.portNumber = htons(ppn->portIdentity.portNumber);
-		break;
-	case TLV_PORT_STATS_NP:
-		psn = (struct port_stats_np *)m->data;
-		psn->portIdentity.portNumber =
-			htons(psn->portIdentity.portNumber);
 		break;
 	}
 }
@@ -563,10 +517,6 @@ static int org_post_recv(struct organization_tlv *org)
 			scaled_ns_n2h(&f->lastGmPhaseChange);
 			f->scaledLastGmPhaseChange = ntohl(f->scaledLastGmPhaseChange);
 			break;
-
-		case 2:
-			if (org->length + sizeof(struct TLV) != sizeof(struct msg_interval_req_tlv))
-				goto bad_length;
 		}
 	}
 	return 0;
@@ -591,106 +541,6 @@ static void org_pre_send(struct organization_tlv *org)
 			f->scaledLastGmPhaseChange = htonl(f->scaledLastGmPhaseChange);
 			break;
 		}
-	}
-}
-
-static int slave_delay_timing_data_post_revc(struct tlv_extra *extra)
-{
-	struct slave_delay_timing_data_tlv *slave_delay =
-		(struct slave_delay_timing_data_tlv *) extra->tlv;
-	size_t base_size = sizeof(slave_delay->sourcePortIdentity), n_items;
-	struct slave_delay_timing_record *record;
-
-	if (tlv_array_invalid(extra->tlv, base_size, sizeof(*record))) {
-		return -EBADMSG;
-	}
-	n_items = tlv_array_count(extra->tlv, base_size, sizeof(*record));
-	record = slave_delay->record;
-
-	NTOHS(slave_delay->sourcePortIdentity.portNumber);
-
-	while (n_items) {
-		NTOHS(record->sequenceId);
-		timestamp_net2host(&record->delayOriginTimestamp);
-		net2host64_unaligned(&record->totalCorrectionField);
-		timestamp_net2host(&record->delayResponseTimestamp);
-		n_items--;
-		record++;
-	}
-
-	return 0;
-}
-
-static void slave_delay_timing_data_pre_send(struct tlv_extra *extra)
-{
-	struct slave_delay_timing_data_tlv *slave_delay =
-		(struct slave_delay_timing_data_tlv *) extra->tlv;
-	size_t base_size = sizeof(slave_delay->sourcePortIdentity), n_items;
-	struct slave_delay_timing_record *record;
-
-	n_items = tlv_array_count(extra->tlv, base_size, sizeof(*record));
-	record = slave_delay->record;
-
-	HTONS(slave_delay->sourcePortIdentity.portNumber);
-
-	while (n_items) {
-		HTONS(record->sequenceId);
-		timestamp_host2net(&record->delayOriginTimestamp);
-		host2net64_unaligned(&record->totalCorrectionField);
-		timestamp_host2net(&record->delayResponseTimestamp);
-		n_items--;
-		record++;
-	}
-}
-
-static int slave_rx_sync_timing_data_post_revc(struct tlv_extra *extra)
-{
-	struct slave_rx_sync_timing_data_tlv *slave_data =
-		(struct slave_rx_sync_timing_data_tlv *) extra->tlv;
-	size_t base_size = sizeof(slave_data->sourcePortIdentity), n_items;
-	struct slave_rx_sync_timing_record *record;
-
-	if (tlv_array_invalid(extra->tlv, base_size, sizeof(*record))) {
-		return -EBADMSG;
-	}
-	n_items = tlv_array_count(extra->tlv, base_size, sizeof(*record));
-	record = slave_data->record;
-
-	NTOHS(slave_data->sourcePortIdentity.portNumber);
-
-	while (n_items) {
-		NTOHS(record->sequenceId);
-		timestamp_net2host(&record->syncOriginTimestamp);
-		net2host64_unaligned(&record->totalCorrectionField);
-		NTOHL(record->scaledCumulativeRateOffset);
-		timestamp_net2host(&record->syncEventIngressTimestamp);
-		n_items--;
-		record++;
-	}
-
-	return 0;
-}
-
-static void slave_rx_sync_timing_data_pre_send(struct tlv_extra *extra)
-{
-	struct slave_rx_sync_timing_data_tlv *slave_data =
-		(struct slave_rx_sync_timing_data_tlv *) extra->tlv;
-	size_t base_size = sizeof(slave_data->sourcePortIdentity), n_items;
-	struct slave_rx_sync_timing_record *record;
-
-	n_items = tlv_array_count(extra->tlv, base_size, sizeof(*record));
-	record = slave_data->record;
-
-	HTONS(slave_data->sourcePortIdentity.portNumber);
-
-	while (n_items) {
-		HTONS(record->sequenceId);
-		timestamp_host2net(&record->syncOriginTimestamp);
-		host2net64_unaligned(&record->totalCorrectionField);
-		HTONL(record->scaledCumulativeRateOffset);
-		timestamp_host2net(&record->syncEventIngressTimestamp);
-		n_items--;
-		record++;
 	}
 }
 
@@ -809,10 +659,11 @@ void tlv_extra_recycle(struct tlv_extra *extra)
 
 int tlv_post_recv(struct tlv_extra *extra)
 {
+	int result = 0;
+	struct management_tlv *mgt;
 	struct management_error_status *mes;
 	struct TLV *tlv = extra->tlv;
-	struct management_tlv *mgt;
-	int result = 0;
+	struct path_trace_tlv *ptt;
 
 	switch (tlv->type) {
 	case TLV_MANAGEMENT:
@@ -842,12 +693,13 @@ int tlv_post_recv(struct tlv_extra *extra)
 		result = unicast_negotiation_post_recv(extra);
 		break;
 	case TLV_PATH_TRACE:
-		if (tlv_array_invalid(tlv, 0, sizeof(struct ClockIdentity))) {
-			goto bad_length;
+		ptt = (struct path_trace_tlv *) tlv;
+		if (path_length(ptt) > PATH_TRACE_MAX) {
+			ptt->length = PATH_TRACE_MAX * sizeof(struct ClockIdentity);
 		}
 		break;
 	case TLV_ALTERNATE_TIME_OFFSET_INDICATOR:
-	case TLV_AUTHENTICATION_2008:
+	case TLV_AUTHENTICATION:
 	case TLV_AUTHENTICATION_CHALLENGE:
 	case TLV_SECURITY_ASSOCIATION_UPDATE:
 	case TLV_CUM_FREQ_SCALE_FACTOR_OFFSET:
@@ -856,25 +708,6 @@ int tlv_post_recv(struct tlv_extra *extra)
 	case TLV_PTPMON_RESP:
 		result = nsm_resp_post_recv(extra);
 		break;
-	case TLV_ORGANIZATION_EXTENSION_PROPAGATE:
-	case TLV_ENHANCED_ACCURACY_METRICS:
-	case TLV_ORGANIZATION_EXTENSION_DO_NOT_PROPAGATE:
-	case TLV_L1_SYNC:
-	case TLV_PORT_COMMUNICATION_AVAILABILITY:
-	case TLV_PROTOCOL_ADDRESS:
-		break;
-	case TLV_SLAVE_RX_SYNC_TIMING_DATA:
-		result = slave_rx_sync_timing_data_post_revc(extra);
-		break;
-	case TLV_SLAVE_RX_SYNC_COMPUTED_DATA:
-	case TLV_SLAVE_TX_EVENT_TIMESTAMPS:
-		break;
-	case TLV_SLAVE_DELAY_TIMING_DATA_NP:
-		result = slave_delay_timing_data_post_revc(extra);
-		break;
-	case TLV_CUMULATIVE_RATE_RATIO:
-	case TLV_PAD:
-	case TLV_AUTHENTICATION:
 	default:
 		break;
 	}
@@ -911,7 +744,7 @@ void tlv_pre_send(struct TLV *tlv, struct tlv_extra *extra)
 		break;
 	case TLV_PATH_TRACE:
 	case TLV_ALTERNATE_TIME_OFFSET_INDICATOR:
-	case TLV_AUTHENTICATION_2008:
+	case TLV_AUTHENTICATION:
 	case TLV_AUTHENTICATION_CHALLENGE:
 	case TLV_SECURITY_ASSOCIATION_UPDATE:
 	case TLV_CUM_FREQ_SCALE_FACTOR_OFFSET:
@@ -920,25 +753,6 @@ void tlv_pre_send(struct TLV *tlv, struct tlv_extra *extra)
 	case TLV_PTPMON_RESP:
 		nsm_resp_pre_send(extra);
 		break;
-	case TLV_ORGANIZATION_EXTENSION_PROPAGATE:
-	case TLV_ENHANCED_ACCURACY_METRICS:
-	case TLV_ORGANIZATION_EXTENSION_DO_NOT_PROPAGATE:
-	case TLV_L1_SYNC:
-	case TLV_PORT_COMMUNICATION_AVAILABILITY:
-	case TLV_PROTOCOL_ADDRESS:
-		break;
-	case TLV_SLAVE_RX_SYNC_TIMING_DATA:
-		slave_rx_sync_timing_data_pre_send(extra);
-		break;
-	case TLV_SLAVE_RX_SYNC_COMPUTED_DATA:
-	case TLV_SLAVE_TX_EVENT_TIMESTAMPS:
-		break;
-	case TLV_SLAVE_DELAY_TIMING_DATA_NP:
-		slave_delay_timing_data_pre_send(extra);
-		break;
-	case TLV_CUMULATIVE_RATE_RATIO:
-	case TLV_PAD:
-	case TLV_AUTHENTICATION:
 	default:
 		break;
 	}

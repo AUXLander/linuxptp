@@ -33,9 +33,6 @@ struct clock;
 /** Opaque type. */
 struct port;
 
-/** The port identity that matches any port. */
-extern const struct PortIdentity wildcard_pid;
-
 /**
  * Returns the dataset from a port's best foreign clock record, if any
  * has yet been discovered. This function does not bring the returned
@@ -97,7 +94,7 @@ int port_forward(struct port *p, struct ptp_message *msg);
  * Forward a message on a given port to the address stored in the message.
  * @param port    A pointer previously obtained via port_open().
  * @param msg     The message to send. Must be in network byte order.
- * @return        Zero on success, negative errno value otherwise.
+ * @return        Zero on success, non-zero otherwise.
  */
 int port_forward_to(struct port *p, struct ptp_message *msg);
 
@@ -126,13 +123,6 @@ struct PortIdentity port_identity(struct port *p);
  * @return         The port number of 'p'.
  */
 int port_number(struct port *p);
-
-/**
- * Obtain a port's name for logging purposes.
- * @param p        A port instance.
- * @return         Loggable name of 'p'.
- */
-const char *port_log_name(struct port *p);
 
 /**
  * Obtain the link status of a port.
@@ -202,7 +192,6 @@ void port_notify_event(struct port *p, enum notification event);
 
 /**
  * Open a network port.
- * @param phc_device    The name of PHC device as found on the command line.
  * @param phc_index     The PHC device index for the network device.
  * @param timestamping  The timestamping mode for this port.
  * @param number	An arbitrary number assigned to this port.
@@ -210,15 +199,11 @@ void port_notify_event(struct port *p, enum notification event);
  * @param clock         A pointer to the system PTP clock.
  * @return A pointer to an open port on success, or NULL otherwise.
  */
-struct port *port_open(const char *phc_device,
-		       int phc_index,
+struct port *port_open(int phc_index,
 		       enum timestamp_type timestamping,
 		       int number,
 		       struct interface *interface,
 		       struct clock *clock);
-
-struct ptp_message *port_signaling_construct(struct port *p,
-					     const struct PortIdentity *tpid);
 
 /**
  * Returns a port's current state.
@@ -336,14 +321,6 @@ enum fault_type last_fault_type(struct port *port);
  */
 void fault_interval(struct port *port, enum fault_type ft,
 		    struct fault_interval *i);
-
-/**
- * Obtain the BMCA type of the port.
- *
- * @param port        A port instance.
- * @return            bmca type.
- */
-enum bmca_select port_bmca(struct port *p);
 
 /**
  * Release all of the memory in the TC transmit descriptor cache.

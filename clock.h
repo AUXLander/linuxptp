@@ -23,7 +23,6 @@
 #include "dm.h"
 #include "ds.h"
 #include "config.h"
-#include "monitor.h"
 #include "notification.h"
 #include "servo.h"
 #include "tlv.h"
@@ -255,46 +254,11 @@ void clock_set_sde(struct clock *c, int sde);
 int clock_poll(struct clock *c);
 
 /**
- * Obtain the servo struct.
- * @param c The clock instance.
- * @return  A pointer to the clock's servo.
- */
-struct servo *clock_servo(struct clock *c);
-
-/**
- * Obtain the current state of clock's servo.
- * @param c The clock instance.
- * @return  The current state of the clock's servo.
- */
-enum servo_state clock_servo_state(struct clock *c);
-
-/**
- * Obtain the slave monitor instance from a clock.
- * @param c The clock instance.
- * @return  The slave monitor associated with the clock.
- */
-struct monitor *clock_slave_monitor(struct clock *c);
-
-/**
  * Obtain the slave-only flag from a clock's default data set.
  * @param c  The clock instance.
  * @return   The value of the clock's slave-only flag.
  */
 int clock_slave_only(struct clock *c);
-
-/**
- * Obtain the max steps removed field from a clock's default data set.
- * @param c  The clock instance.
- * @return   The value of the clock's max steps removed field.
- */
-UInteger8 clock_max_steps_removed(struct clock *c);
-
-/**
- * Obtain the clock class threshold field from a clock's default data set.
- * @param c  The clock instance.
- * @return   Configured clock class threshold value.
- */
-UInteger8 clock_get_clock_class_threshold(struct clock *c);
 
 /**
  * Obtain the steps removed field from a clock's current data set.
@@ -335,9 +299,9 @@ void clock_sync_interval(struct clock *c, int n);
 /**
  * Obtain a clock's time properties data set.
  * @param c  The clock instance.
- * @return   A copy of the clock's time properties data set.
+ * @return   A pointer to the time properties data set of the clock.
  */
-struct timePropertiesDS clock_time_properties(struct clock *c);
+struct timePropertiesDS *clock_time_properties(struct clock *c);
 
 /**
  * Update a clock's time properties data set.

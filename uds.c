@@ -55,11 +55,11 @@ static int uds_close(struct transport *t, struct fdarray *fda)
 static int uds_open(struct transport *t, struct interface *iface, struct fdarray *fda,
 		    enum timestamp_type tt)
 {
-	char *uds_path = config_get_string(t->cfg, NULL, "uds_address");
-	struct uds *uds = container_of(t, struct uds, t);
-	const char *name = interface_name(iface);
-	struct sockaddr_un sa;
 	int fd, err;
+	struct sockaddr_un sa;
+	struct uds *uds = container_of(t, struct uds, t);
+	char *uds_path = config_get_string(t->cfg, NULL, "uds_address");
+	char *name = iface->name;
 
 	fd = socket(AF_LOCAL, SOCK_DGRAM, 0);
 	if (fd < 0) {
@@ -119,8 +119,8 @@ static int uds_send(struct transport *t, struct fdarray *fda,
 		addr = &uds->address;
 
 	cnt = sendto(fd, buf, buflen, 0, &addr->sa, addr->len);
-	if (cnt < 1) {
-		return -errno;
+	if (cnt <= 0 && errno != ECONNREFUSED) {
+		pr_err("uds: sendto failed: %m");
 	}
 	return cnt;
 }
@@ -144,3 +144,4 @@ struct transport *uds_transport_create(void)
 	uds->t.release = uds_release;
 	return &uds->t;
 }
+

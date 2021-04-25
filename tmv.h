@@ -20,15 +20,12 @@
 #ifndef HAVE_TMV_H
 #define HAVE_TMV_H
 
-#include <linux/ptp_clock.h>
 #include <time.h>
 
 #include "ddt.h"
 #include "pdt.h"
 
 #define NS_PER_SEC 1000000000LL
-#define MIN_TMV_TO_TIMEINTERVAL 0xFFFF800000000000ll
-#define MAX_TMV_TO_TIMEINTERVAL 0x00007FFFFFFFFFFFll
 
 /**
  * We implement the time value as a 64 bit signed integer containing
@@ -112,20 +109,8 @@ static inline int64_t tmv_to_nanoseconds(tmv_t x)
 	return x.ns;
 }
 
-static inline tmv_t nanoseconds_to_tmv(int64_t ns)
-{
-	tmv_t t;
-	t.ns = ns;
-	return t;
-}
-
 static inline TimeInterval tmv_to_TimeInterval(tmv_t x)
 {
-	if (x.ns < (int64_t)MIN_TMV_TO_TIMEINTERVAL) {
-		return MIN_TMV_TO_TIMEINTERVAL << 16;
-	} else if (x.ns > (int64_t)MAX_TMV_TO_TIMEINTERVAL) {
-		return MAX_TMV_TO_TIMEINTERVAL << 16;
-	}
 	return x.ns << 16;
 }
 
@@ -151,27 +136,10 @@ static inline tmv_t timespec_to_tmv(struct timespec ts)
 	return t;
 }
 
-static inline struct timespec tmv_to_timespec(tmv_t t)
-{
-	struct timespec ts;
-
-	ts.tv_sec  = t.ns / NS_PER_SEC;
-	ts.tv_nsec = t.ns % NS_PER_SEC;
-
-	return ts;
-}
-
 static inline tmv_t timestamp_to_tmv(struct timestamp ts)
 {
 	tmv_t t;
 	t.ns = ts.sec * NS_PER_SEC + ts.nsec;
-	return t;
-}
-
-static inline tmv_t pct_to_tmv(struct ptp_clock_time pct)
-{
-	tmv_t t;
-	t.ns = pct.sec * NS_PER_SEC + pct.nsec;
 	return t;
 }
 

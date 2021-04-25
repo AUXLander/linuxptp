@@ -35,25 +35,12 @@
 #define TLV_ACKNOWLEDGE_CANCEL_UNICAST_TRANSMISSION	0x0007
 #define TLV_PATH_TRACE					0x0008
 #define TLV_ALTERNATE_TIME_OFFSET_INDICATOR		0x0009
-#define TLV_AUTHENTICATION_2008				0x2000
+#define TLV_AUTHENTICATION				0x2000
 #define TLV_AUTHENTICATION_CHALLENGE			0x2001
 #define TLV_SECURITY_ASSOCIATION_UPDATE			0x2002
 #define TLV_CUM_FREQ_SCALE_FACTOR_OFFSET		0x2003
 #define TLV_PTPMON_REQ					0x21FE
 #define TLV_PTPMON_RESP					0x21FF
-#define TLV_ORGANIZATION_EXTENSION_PROPAGATE		0x4000
-#define TLV_ENHANCED_ACCURACY_METRICS			0x4001
-#define TLV_ORGANIZATION_EXTENSION_DO_NOT_PROPAGATE	0x8000
-#define TLV_L1_SYNC					0x8001
-#define TLV_PORT_COMMUNICATION_AVAILABILITY		0x8002
-#define TLV_PROTOCOL_ADDRESS				0x8003
-#define TLV_SLAVE_RX_SYNC_TIMING_DATA			0x8004
-#define TLV_SLAVE_RX_SYNC_COMPUTED_DATA			0x8005
-#define TLV_SLAVE_TX_EVENT_TIMESTAMPS			0x8006
-#define TLV_SLAVE_DELAY_TIMING_DATA_NP			0x7F00
-#define TLV_CUMULATIVE_RATE_RATIO			0x8007
-#define TLV_PAD						0x8008
-#define TLV_AUTHENTICATION				0x8009
 
 enum management_action {
 	GET,
@@ -92,14 +79,11 @@ enum management_action {
 #define TLV_ALTERNATE_TIME_OFFSET_NAME			0x201F
 #define TLV_ALTERNATE_TIME_OFFSET_MAX_KEY		0x2020
 #define TLV_ALTERNATE_TIME_OFFSET_PROPERTIES		0x2021
-#define TLV_EXTERNAL_PORT_CONFIGURATION_ENABLED		0x3000
-#define TLV_HOLDOVER_UPGRADE_ENABLE			0x3002
 #define TLV_TRANSPARENT_CLOCK_DEFAULT_DATA_SET		0x4000
 #define TLV_PRIMARY_DOMAIN				0x4002
 #define TLV_TIME_STATUS_NP				0xC000
 #define TLV_GRANDMASTER_SETTINGS_NP			0xC001
 #define TLV_SUBSCRIBE_EVENTS_NP				0xC003
-#define TLV_SYNCHRONIZATION_UNCERTAIN_NP		0xC006
 
 /* Port management ID values */
 #define TLV_NULL_MANAGEMENT				0x0000
@@ -116,15 +100,11 @@ enum management_action {
 #define TLV_UNICAST_MASTER_MAX_TABLE_SIZE		0x2019
 #define TLV_ACCEPTABLE_MASTER_TABLE_ENABLED		0x201B
 #define TLV_ALTERNATE_MASTER				0x201D
-#define TLV_MASTER_ONLY					0x3001
-#define TLV_EXT_PORT_CONFIG_PORT_DATA_SET		0x3003
-#define TLV_SLAVE_EVENT_MONITORING			0x3004	// TODO - proposed value, missing in 1588 v2.1
 #define TLV_TRANSPARENT_CLOCK_PORT_DATA_SET		0x4001
 #define TLV_DELAY_MECHANISM				0x6000
 #define TLV_LOG_MIN_PDELAY_REQ_INTERVAL			0x6001
 #define TLV_PORT_DATA_SET_NP				0xC002
 #define TLV_PORT_PROPERTIES_NP				0xC004
-#define TLV_PORT_STATS_NP				0xC005
 
 /* Management error ID values */
 #define TLV_RESPONSE_TOO_BIG				0x0001
@@ -134,11 +114,6 @@ enum management_action {
 #define TLV_NOT_SETABLE					0x0005
 #define TLV_NOT_SUPPORTED				0x0006
 #define TLV_GENERAL_ERROR				0xFFFE
-
-/* Values for the SYNCHRONIZATION_UNCERTAIN_NP management TLV */
-#define SYNC_UNCERTAIN_DONTCARE	0xff
-#define SYNC_UNCERTAIN_FALSE	0
-#define SYNC_UNCERTAIN_TRUE	1
 
 #define CANCEL_UNICAST_MAINTAIN_REQUEST	(1 << 0)
 #define CANCEL_UNICAST_MAINTAIN_GRANT	(1 << 1)
@@ -225,11 +200,6 @@ struct path_trace_tlv {
 	struct ClockIdentity cid[0];
 } PACKED;
 
-static inline unsigned int path_length(struct path_trace_tlv *p)
-{
-	return p->length / sizeof(struct ClockIdentity);
-}
-
 struct request_unicast_xmit_tlv {
 	Enumeration16   type;
 	UInteger16      length;
@@ -238,44 +208,10 @@ struct request_unicast_xmit_tlv {
 	UInteger32      durationField;
 } PACKED;
 
-struct slave_delay_timing_record {
-	UInteger16          sequenceId;
-	struct Timestamp    delayOriginTimestamp;
-	TimeInterval        totalCorrectionField;
-	struct Timestamp    delayResponseTimestamp;
-} PACKED;
-
-struct slave_delay_timing_data_tlv {
-	Enumeration16        type;
-	UInteger16           length;
-	struct PortIdentity  sourcePortIdentity;
-	struct slave_delay_timing_record record[0];
-} PACKED;
-
-#define SLAVE_DELAY_TIMING_MAX \
-	((sizeof(struct message_data) - sizeof(struct signaling_msg) -	\
-	  sizeof(struct slave_delay_timing_data_tlv)) /		\
-	 sizeof(struct slave_delay_timing_record))
-
-struct slave_rx_sync_timing_record {
-	UInteger16          sequenceId;
-	struct Timestamp    syncOriginTimestamp;
-	TimeInterval        totalCorrectionField;
-	Integer32           scaledCumulativeRateOffset;
-	struct Timestamp    syncEventIngressTimestamp;
-} PACKED;
-
-struct slave_rx_sync_timing_data_tlv {
-	Enumeration16        type;
-	UInteger16           length;
-	struct PortIdentity  sourcePortIdentity;
-	struct slave_rx_sync_timing_record record[0];
-} PACKED;
-
-#define SLAVE_RX_SYNC_TIMING_MAX \
-	((sizeof(struct message_data) - sizeof(struct signaling_msg) -	\
-	  sizeof(struct slave_rx_sync_timing_data_tlv)) /		\
-	 sizeof(struct slave_rx_sync_timing_record))
+static inline unsigned int path_length(struct path_trace_tlv *p)
+{
+	return p->length / sizeof(struct ClockIdentity);
+}
 
 typedef struct Integer96 {
 	uint16_t nanoseconds_msb;
@@ -292,18 +228,6 @@ struct follow_up_info_tlv {
 	UInteger16    gmTimeBaseIndicator;
 	ScaledNs      lastGmPhaseChange;
 	Integer32     scaledLastGmPhaseChange;
-} PACKED;
-
-struct msg_interval_req_tlv {
-	Enumeration16 type;
-	UInteger16    length;
-	Octet         id[3];
-	Octet         subtype[3];
-	Integer8      linkDelayInterval;
-	Integer8      timeSyncInterval;
-	Integer8      announceInterval;
-	Octet         flags;
-	Octet         reserved[2];
 } PACKED;
 
 struct time_status_np {
@@ -342,11 +266,6 @@ struct port_properties_np {
 	uint8_t port_state;
 	uint8_t timestamping;
 	struct PTPText interface;
-} PACKED;
-
-struct port_stats_np {
-	struct PortIdentity portIdentity;
-	struct PortStats stats;
 } PACKED;
 
 #define PROFILE_ID_LEN 6

@@ -1,4 +1,4 @@
-.TH TIMEMASTER 8 "January 2021" "linuxptp"
+.TH TIMEMASTER 8 "October 2014" "linuxptp"
 .SH NAME
 
 timemaster - run NTP with PTP as reference clocks
@@ -130,7 +130,7 @@ extra options are added by default.
 
 The \fBptp_domain\fR section specifies a PTP domain that should be used as a
 time source. The PTP domain number is included in the name of the section. The
-\fBptp4l\fR instances are configured to run in the \fBclientOnly\fR mode. In
+\fBptp4l\fR instances are configured to run in the \fBslaveOnly\fR mode. In
 this section at least the \fBinterfaces\fR option needs to be set, other
 options are optional.
 
@@ -253,13 +253,9 @@ Specify extra options that should be added to all \fBptp4l\fR command lines. By
 default, \fB\-l 5\fR is added to the command lines.
 
 .SS [ptp4l.conf]
-Settings specified in this section are copied directly to the global section of
-the configuration files generated for all \fBptp4l\fR instances. There is no
-default content of this section.
-
-Other sections (e.g. \fB[unicast_master_table]\fR) may be specified here, but
-lines beginning with the bracket need to be prefixed with the \fB>\fR character
-to prevent \fBtimemaster\fR from parsing it as a beginning of another section.
+Settings specified in this section are copied directly to the configuration
+files generated for all \fBptp4l\fR instances. There is no default content of
+this section.
 
 .SH NOTES
 For best accuracy, \fBchronyd\fR is usually preferred over \fBntpd\fR, it also

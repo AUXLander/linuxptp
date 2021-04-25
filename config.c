@@ -19,12 +19,10 @@
 #include <ctype.h>
 #include <float.h>
 #include <limits.h>
-#include <linux/ptp_clock.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "as_capable.h"
 #include "bmc.h"
 #include "clock.h"
 #include "config.h"
@@ -32,10 +30,6 @@
 #include "hash.h"
 #include "print.h"
 #include "util.h"
-
-struct interface {
-	STAILQ_ENTRY(interface) list;
-};
 
 enum config_section {
 	GLOBAL_SECTION,
@@ -170,20 +164,6 @@ static struct config_enum delay_mech_enu[] = {
 	{ NULL, 0 },
 };
 
-static struct config_enum extts_polarity_enu[] = {
-	{ "rising",  PTP_RISING_EDGE  },
-	{ "falling", PTP_FALLING_EDGE },
-	{ "both",    PTP_RISING_EDGE | PTP_FALLING_EDGE },
-	{ NULL, 0 },
-};
-
-static struct config_enum hwts_filter_enu[] = {
-	{ "normal",  HWTS_FILTER_NORMAL  },
-	{ "check",   HWTS_FILTER_CHECK   },
-	{ "full",    HWTS_FILTER_FULL    },
-	{ NULL, 0 },
-};
-
 static struct config_enum nw_trans_enu[] = {
 	{ "L2",    TRANS_IEEE_802_3 },
 	{ "UDPv4", TRANS_UDP_IPV4   },
@@ -208,30 +188,13 @@ static struct config_enum tsproc_enu[] = {
 	{ NULL, 0 },
 };
 
-static struct config_enum as_capable_enu[] = {
-	{ "true", AS_CAPABLE_TRUE },
-	{ "auto", AS_CAPABLE_AUTO },
-	{ NULL, 0 },
-};
-
-static struct config_enum bmca_enu[] = {
-	{ "ptp",  BMCA_PTP  },
-	{ "noop", BMCA_NOOP },
-	{ NULL, 0 },
-};
-
 struct config_item config_tab[] = {
 	PORT_ITEM_INT("announceReceiptTimeout", 3, 2, UINT8_MAX),
-	PORT_ITEM_ENU("asCapable", AS_CAPABLE_AUTO, as_capable_enu),
 	GLOB_ITEM_INT("assume_two_step", 0, 0, 1),
 	PORT_ITEM_INT("boundary_clock_jbod", 0, 0, 1),
-	PORT_ITEM_ENU("BMCA", BMCA_PTP, bmca_enu),
 	GLOB_ITEM_INT("check_fup_sync", 0, 0, 1),
-	GLOB_ITEM_INT("clientOnly", 0, 0, 1),
 	GLOB_ITEM_INT("clockAccuracy", 0xfe, 0, UINT8_MAX),
 	GLOB_ITEM_INT("clockClass", 248, 0, UINT8_MAX),
-	GLOB_ITEM_STR("clockIdentity", "000000.0000.000000"),
-	GLOB_ITEM_INT("clock_class_threshold", CLOCK_CLASS_THRESHOLD_DEFAULT, 6, CLOCK_CLASS_THRESHOLD_DEFAULT),
 	GLOB_ITEM_ENU("clock_servo", CLOCK_SERVO_PI, clock_servo_enu),
 	GLOB_ITEM_ENU("clock_type", CLOCK_TYPE_ORDINARY, clock_type_enu),
 	GLOB_ITEM_ENU("dataset_comparison", DS_CMP_IEEE1588, dataset_comp_enu),
@@ -252,36 +215,27 @@ struct config_item config_tab[] = {
 	GLOB_ITEM_INT("G.8275.defaultDS.localPriority", 128, 1, UINT8_MAX),
 	PORT_ITEM_INT("G.8275.portDS.localPriority", 128, 1, UINT8_MAX),
 	GLOB_ITEM_INT("gmCapable", 1, 0, 1),
-	GLOB_ITEM_ENU("hwts_filter", HWTS_FILTER_NORMAL, hwts_filter_enu),
 	PORT_ITEM_INT("hybrid_e2e", 0, 0, 1),
-	PORT_ITEM_INT("ignore_source_id", 0, 0, 1),
 	PORT_ITEM_INT("ignore_transport_specific", 0, 0, 1),
 	PORT_ITEM_INT("ingressLatency", 0, INT_MIN, INT_MAX),
-	PORT_ITEM_INT("inhibit_announce", 0, 0, 1),
-	PORT_ITEM_INT("inhibit_delay_req", 0, 0, 1),
 	PORT_ITEM_INT("inhibit_multicast_service", 0, 0, 1),
 	GLOB_ITEM_INT("initial_delay", 0, 0, INT_MAX),
 	GLOB_ITEM_INT("kernel_leap", 1, 0, 1),
-	GLOB_ITEM_STR("leapfile", NULL),
 	PORT_ITEM_INT("logAnnounceInterval", 1, INT8_MIN, INT8_MAX),
 	PORT_ITEM_INT("logMinDelayReqInterval", 0, INT8_MIN, INT8_MAX),
 	PORT_ITEM_INT("logMinPdelayReqInterval", 0, INT8_MIN, INT8_MAX),
 	PORT_ITEM_INT("logSyncInterval", 0, INT8_MIN, INT8_MAX),
 	GLOB_ITEM_INT("logging_level", LOG_INFO, PRINT_LEVEL_MIN, PRINT_LEVEL_MAX),
-	PORT_ITEM_INT("masterOnly", 0, 0, 1), /*deprecated*/
-	GLOB_ITEM_INT("maxStepsRemoved", 255, 2, UINT8_MAX),
+	PORT_ITEM_INT("masterOnly", 0, 0, 1),
 	GLOB_ITEM_STR("message_tag", NULL),
 	GLOB_ITEM_STR("manufacturerIdentity", "00:00:00"),
 	GLOB_ITEM_INT("max_frequency", 900000000, 0, INT_MAX),
 	PORT_ITEM_INT("min_neighbor_prop_delay", -20000000, INT_MIN, -1),
-	PORT_ITEM_INT("msg_interval_request", 0, 0, 1),
 	PORT_ITEM_INT("neighborPropDelayThresh", 20000000, 0, INT_MAX),
 	PORT_ITEM_INT("net_sync_monitor", 0, 0, 1),
 	PORT_ITEM_ENU("network_transport", TRANS_UDP_IPV4, nw_trans_enu),
 	GLOB_ITEM_INT("ntpshm_segment", 0, INT_MIN, INT_MAX),
 	GLOB_ITEM_INT("offsetScaledLogVariance", 0xffff, 0, UINT16_MAX),
-	PORT_ITEM_INT("operLogPdelayReqInterval", 0, INT8_MIN, INT8_MAX),
-	PORT_ITEM_INT("operLogSyncInterval", 0, INT8_MIN, INT8_MAX),
 	PORT_ITEM_INT("path_trace_enabled", 0, 0, 1),
 	GLOB_ITEM_DBL("pi_integral_const", 0.0, 0.0, DBL_MAX),
 	GLOB_ITEM_DBL("pi_integral_exponent", 0.4, -DBL_MAX, DBL_MAX),
@@ -298,36 +252,20 @@ struct config_item config_tab[] = {
 	PORT_ITEM_STR("p2p_dst_mac", "01:80:C2:00:00:0E"),
 	GLOB_ITEM_STR("revisionData", ";;"),
 	GLOB_ITEM_INT("sanity_freq_limit", 200000000, 0, INT_MAX),
-	PORT_ITEM_INT("serverOnly", 0, 0, 1),
-	GLOB_ITEM_INT("servo_num_offset_values", 10, 0, INT_MAX),
-	GLOB_ITEM_INT("servo_offset_threshold", 0, 0, INT_MAX),
-	GLOB_ITEM_STR("slave_event_monitor", ""),
-	GLOB_ITEM_INT("slaveOnly", 0, 0, 1), /*deprecated*/
-	GLOB_ITEM_INT("socket_priority", 0, 0, 15),
+	GLOB_ITEM_INT("slaveOnly", 0, 0, 1),
 	GLOB_ITEM_DBL("step_threshold", 0.0, 0.0, DBL_MAX),
-	GLOB_ITEM_INT("step_window", 0, 0, INT_MAX),
 	GLOB_ITEM_INT("summary_interval", 0, INT_MIN, INT_MAX),
 	PORT_ITEM_INT("syncReceiptTimeout", 0, 0, UINT8_MAX),
 	GLOB_ITEM_INT("tc_spanning_tree", 0, 0, 1),
 	GLOB_ITEM_INT("timeSource", INTERNAL_OSCILLATOR, 0x10, 0xfe),
 	GLOB_ITEM_ENU("time_stamping", TS_HARDWARE, timestamping_enu),
 	PORT_ITEM_INT("transportSpecific", 0, 0, 0x0F),
-	PORT_ITEM_INT("ts2phc.channel", 0, 0, INT_MAX),
-	PORT_ITEM_INT("ts2phc.extts_correction", 0, INT_MIN, INT_MAX),
-	PORT_ITEM_ENU("ts2phc.extts_polarity", PTP_RISING_EDGE, extts_polarity_enu),
-	PORT_ITEM_INT("ts2phc.master", 0, 0, 1),
-	GLOB_ITEM_STR("ts2phc.nmea_remote_host", ""),
-	GLOB_ITEM_STR("ts2phc.nmea_remote_port", ""),
-	GLOB_ITEM_STR("ts2phc.nmea_serialport", "/dev/ttyS0"),
-	PORT_ITEM_INT("ts2phc.pin_index", 0, 0, INT_MAX),
-	GLOB_ITEM_INT("ts2phc.pulsewidth", 500000000, 1000000, 999000000),
 	PORT_ITEM_ENU("tsproc_mode", TSPROC_FILTER, tsproc_enu),
 	GLOB_ITEM_INT("twoStepFlag", 1, 0, 1),
 	GLOB_ITEM_INT("tx_timestamp_timeout", 1, 1, INT_MAX),
 	PORT_ITEM_INT("udp_ttl", 1, 1, 255),
 	PORT_ITEM_INT("udp6_scope", 0x0E, 0x00, 0x0F),
 	GLOB_ITEM_STR("uds_address", "/var/run/ptp4l"),
-	GLOB_ITEM_STR("uds_ro_address", "/var/run/ptp4lro"),
 	PORT_ITEM_INT("unicast_listen", 0, 0, 1),
 	PORT_ITEM_INT("unicast_master_table", 0, 0, INT_MAX),
 	PORT_ITEM_INT("unicast_req_duration", 3600, 10, INT_MAX),
@@ -335,7 +273,6 @@ struct config_item config_tab[] = {
 	GLOB_ITEM_STR("userDescription", ""),
 	GLOB_ITEM_INT("utc_offset", CURRENT_UTC_OFFSET, 0, INT_MAX),
 	GLOB_ITEM_INT("verbose", 0, 0, 1),
-	GLOB_ITEM_INT("write_phase_mode", 0, 0, 1),
 };
 
 static struct unicast_master_table *current_uc_mtab;
@@ -712,10 +649,6 @@ static void check_deprecated_options(const char **option)
 		new_option = "first_step_threshold";
 	} else if (!strcmp(*option, "pi_max_frequency")) {
 		new_option = "max_frequency";
-	} else if (!strcmp(*option, "masterOnly")) {
-		new_option = "serverOnly";
-	} else if (!strcmp(*option, "slaveOnly")) {
-		new_option = "clientOnly";
 	}
 
 	if (new_option) {
@@ -744,7 +677,7 @@ static struct option *config_alloc_longopts(void)
 	return opts;
 }
 
-int config_read(const char *name, struct config *cfg)
+int config_read(char *name, struct config *cfg)
 {
 	enum config_section current_section = UNKNOWN_SECTION;
 	enum parser_result parser_res;
@@ -809,15 +742,15 @@ int config_read(const char *name, struct config *cfg)
 		if (parse_setting_line(line, &option, &value)) {
 			fprintf(stderr, "could not parse line %d in %s section\n",
 				line_num, current_section == GLOBAL_SECTION ?
-				"global" : interface_name(current_port));
+				"global" : current_port->name);
 			goto parse_error;
 		}
 
 		check_deprecated_options(&option);
 
 		parser_res = parse_item(cfg, 0, current_section == GLOBAL_SECTION ?
-					NULL : interface_name(current_port),
-					option, value);
+					NULL : current_port->name, option, value);
+
 		switch (parser_res) {
 		case PARSED_OK:
 			break;
@@ -825,7 +758,7 @@ int config_read(const char *name, struct config *cfg)
 			fprintf(stderr, "unknown option %s at line %d in %s section\n",
 				option, line_num,
 				current_section == GLOBAL_SECTION ? "global" :
-				interface_name(current_port));
+				current_port->name);
 			goto parse_error;
 		case BAD_VALUE:
 			fprintf(stderr, "%s is a bad value for option %s at line %d\n",
@@ -851,23 +784,23 @@ parse_error:
 	return -2;
 }
 
-struct interface *config_create_interface(const char *name, struct config *cfg)
+struct interface *config_create_interface(char *name, struct config *cfg)
 {
 	struct interface *iface;
-	const char *ifname;
 
 	/* only create each interface once (by name) */
 	STAILQ_FOREACH(iface, &cfg->interfaces, list) {
-		ifname = interface_name(iface);
-		if (0 == strncmp(name, ifname, MAX_IFNAME_SIZE))
+		if (0 == strncmp(name, iface->name, MAX_IFNAME_SIZE))
 			return iface;
 	}
 
-	iface = interface_create(name);
+	iface = calloc(1, sizeof(struct interface));
 	if (!iface) {
 		fprintf(stderr, "cannot allocate memory for a port\n");
 		return NULL;
 	}
+
+	strncpy(iface->name, name, MAX_IFNAME_SIZE);
 	STAILQ_INSERT_TAIL(&cfg->interfaces, iface, list);
 	cfg->n_interfaces++;
 
@@ -938,7 +871,7 @@ void config_destroy(struct config *cfg)
 
 	while ((iface = STAILQ_FIRST(&cfg->interfaces))) {
 		STAILQ_REMOVE_HEAD(&cfg->interfaces, list);
-		interface_destroy(iface);
+		free(iface);
 	}
 	while ((table = STAILQ_FIRST(&cfg->unicast_master_tables))) {
 		while ((address = STAILQ_FIRST(&table->addrs))) {
@@ -1044,8 +977,6 @@ int config_harmonize_onestep(struct config *cfg)
 int config_parse_option(struct config *cfg, const char *opt, const char *val)
 {
 	enum parser_result result;
-
-	check_deprecated_options(&opt);
 
 	result = parse_item(cfg, 1, NULL, opt, val);
 

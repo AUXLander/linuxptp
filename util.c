@@ -25,7 +25,6 @@
 #include <string.h>
 
 #include "address.h"
-#include "phc.h"
 #include "print.h"
 #include "sk.h"
 #include "util.h"
@@ -70,24 +69,6 @@ const char *ev_str[] = {
 	"RS_PASSIVE",
 };
 
-const char *ts_str(enum timestamp_type ts)
-{
-	switch (ts) {
-	case TS_SOFTWARE:
-		return "SOFTWARE";
-	case TS_HARDWARE:
-		return "HARDWARE";
-	case TS_LEGACY_HW:
-		return "LEGACY_HW";
-	case TS_ONESTEP:
-		return "ONESTEP";
-	case TS_P2P1STEP:
-		return "P2P1STEP";
-	}
-
-	return "???";
-}
-
 int addreq(enum transport_type type, struct address *a, struct address *b)
 {
 	void *bufa, *bufb;
@@ -97,12 +78,7 @@ int addreq(enum transport_type type, struct address *a, struct address *b)
 	case TRANS_UDP_IPV4:
 		bufa = &a->sin.sin_addr;
 		bufb = &b->sin.sin_addr;
-		len = sizeof(a->sin.sin_addr);
-		break;
-	case TRANS_UDP_IPV6:
-		bufa = &a->sin6.sin6_addr;
-		bufb = &b->sin6.sin6_addr;
-		len = sizeof(a->sin6.sin6_addr);
+		len = sizeof(a->sin);
 		break;
 	case TRANS_IEEE_802_3:
 		bufa = &a->sll.sll_addr;
@@ -110,6 +86,7 @@ int addreq(enum transport_type type, struct address *a, struct address *b)
 		len = MAC_LEN;
 		break;
 	case TRANS_UDS:
+	case TRANS_UDP_IPV6:
 	case TRANS_DEVICENET:
 	case TRANS_CONTROLNET:
 	case TRANS_PROFINET:
@@ -190,67 +167,16 @@ char *portaddr2str(struct PortAddress *addr)
 	return buf;
 }
 
-void posix_clock_close(clockid_t clock)
-{
-	if (clock == CLOCK_REALTIME) {
-		return;
-	}
-	phc_close(clock);
-}
-
-clockid_t posix_clock_open(const char *device, int *phc_index)
-{
-	struct sk_ts_info ts_info;
-	char phc_device[19];
-	int clkid;
-
-	/* check if device is CLOCK_REALTIME */
-	if (!strcasecmp(device, "CLOCK_REALTIME")) {
-		return CLOCK_REALTIME;
-	}
-	/* check if device is valid phc device */
-	clkid = phc_open(device);
-	if (clkid != CLOCK_INVALID) {
-		if (!strncmp(device, "/dev/ptp", strlen("/dev/ptp"))) {
-			int r = get_ranged_int(device + strlen("/dev/ptp"),
-					       phc_index, 0, 65535);
-			if (r) {
-				fprintf(stderr,
-					"failed to parse PHC index from %s\n",
-					device);
-				return -1;
-			}
-		}
-		return clkid;
-	}
-	/* check if device is a valid ethernet device */
-	if (sk_get_ts_info(device, &ts_info) || !ts_info.valid) {
-		pr_err("unknown clock %s: %m", device);
-		return CLOCK_INVALID;
-	}
-	if (ts_info.phc_index < 0) {
-		pr_err("interface %s does not have a PHC", device);
-		return CLOCK_INVALID;
-	}
-	snprintf(phc_device, sizeof(phc_device), "/dev/ptp%d", ts_info.phc_index);
-	clkid = phc_open(phc_device);
-	if (clkid == CLOCK_INVALID) {
-		pr_err("cannot open %s for %s: %m", phc_device, device);
-	}
-	*phc_index = ts_info.phc_index;
-	return clkid;
-}
-
 int str2addr(enum transport_type type, const char *s, struct address *addr)
 {
 	unsigned char mac[MAC_LEN];
 	struct in_addr ipv4_addr;
-	struct in6_addr ipv6_addr;
 
 	memset(addr, 0, sizeof(*addr));
 
 	switch (type) {
 	case TRANS_UDS:
+	case TRANS_UDP_IPV6:
 	case TRANS_DEVICENET:
 	case TRANS_CONTROLNET:
 	case TRANS_PROFINET:
@@ -264,15 +190,6 @@ int str2addr(enum transport_type type, const char *s, struct address *addr)
 		addr->sin.sin_family = AF_INET;
 		addr->sin.sin_addr = ipv4_addr;
 		addr->len = sizeof(addr->sin);
-		break;
-	case TRANS_UDP_IPV6:
-		if (1 != inet_pton(AF_INET6, s, &ipv6_addr)) {
-			pr_err("bad IPv6 address");
-			return -1;
-		}
-		addr->sin6.sin6_family = AF_INET6;
-		addr->sin6.sin6_addr = ipv6_addr;
-		addr->len = sizeof(addr->sin6);
 		break;
 	case TRANS_IEEE_802_3:
 		if (str2mac(s, mac)) {
@@ -299,21 +216,6 @@ int str2mac(const char *s, unsigned char mac[MAC_LEN])
 	}
 	memcpy(mac, buf, MAC_LEN);
 	return 0;
-}
-
-int str2cid(const char *s, struct ClockIdentity *result)
-{
-	struct ClockIdentity cid;
-	unsigned char *ptr = cid.id;
-	int c;
-	c = sscanf(s, " %02hhx%02hhx%02hhx.%02hhx%02hhx.%02hhx%02hhx%02hhx",
-		   &ptr[0], &ptr[1], &ptr[2], &ptr[3],
-		   &ptr[4], &ptr[5], &ptr[6], &ptr[7]);
-	if (c == 8) {
-		*result = cid;
-		return 0;
-	}
-	return -1;
 }
 
 int str2pid(const char *s, struct PortIdentity *result)
@@ -580,10 +482,6 @@ int handle_term_signals(void)
 	}
 	if (SIG_ERR == signal(SIGTERM, handle_int_quit_term)) {
 		fprintf(stderr, "cannot handle SIGTERM\n");
-		return -1;
-	}
-	if (SIG_ERR == signal(SIGHUP, handle_int_quit_term)) {
-		fprintf(stderr, "cannot handle SIGHUP\n");
 		return -1;
 	}
 	return 0;

@@ -30,12 +30,7 @@
 #include "tlv.h"
 #include "tmv.h"
 
-/* Version definition for IEEE 1588-2019 */
-#define PTP_MAJOR_VERSION	2
-#define PTP_MINOR_VERSION	1
-#define PTP_VERSION		(PTP_MINOR_VERSION << 4 | PTP_MAJOR_VERSION)
-
-#define MAJOR_VERSION_MASK	0x0f
+#define PTP_VERSION 2
 
 /* Values for the messageType field */
 #define SYNC                  0x0
@@ -61,13 +56,6 @@
 #define PTP_TIMESCALE  (1<<3)
 #define TIME_TRACEABLE (1<<4)
 #define FREQ_TRACEABLE (1<<5)
-#define SYNC_UNCERTAIN (1<<6)
-
-/*
- * Signaling interval special values. For more info look at 802.1AS table 10-11
- */
-#define SIGNAL_NO_CHANGE   -128
-#define SIGNAL_SET_INITIAL 126
 
 enum timestamp_type {
 	TS_SOFTWARE,
@@ -94,7 +82,7 @@ enum controlField {
 
 struct ptp_header {
 	uint8_t             tsmt; /* transportSpecific | messageType */
-	uint8_t             ver;  /* minorVersionPTP   | versionPTP  */
+	uint8_t             ver;  /* reserved          | versionPTP  */
 	UInteger16          messageLength;
 	UInteger8           domainNumber;
 	Octet               reserved1;
@@ -253,30 +241,6 @@ static inline uint8_t management_action(struct ptp_message *m)
 }
 
 /**
- * Obtain the data field from the TLV in a management message.
- * @param m  A management message.
- * @return   A pointer to the TLV data field.
- */
-static inline void *management_tlv_data(struct ptp_message *msg)
-{
-	struct management_tlv *mgt;
-	mgt = (struct management_tlv *) msg->management.suffix;
-	return mgt->data;
-}
-
-/**
- * Obtain the managementId field from the TLV in a management message.
- * @param m  A management message.
- * @return   The value of the ID field.
- */
-static inline int management_tlv_id(struct ptp_message *m)
-{
-	struct management_tlv *mgt;
-	mgt = (struct management_tlv *) m->management.suffix;
-	return mgt->id;
-}
-
-/**
  * Test a given bit in a message's flag field.
  * @param m      Message to test.
  * @param index  Index into flag field, either 0 or 1.
@@ -335,7 +299,7 @@ static inline UInteger8 msg_transport_specific(struct ptp_message *m)
  * @param m  Message to test.
  * @return   The value of the messageType field.
  */
-static inline int msg_type(const struct ptp_message *m)
+static inline int msg_type(struct ptp_message *m)
 {
 	return m->header.tsmt & 0x0f;
 }

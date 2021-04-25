@@ -26,8 +26,6 @@
 #include "udp6.h"
 #include "uds.h"
 
-#include "timestamper.h"
-
 int transport_close(struct transport *t, struct fdarray *fda)
 {
 	return t->close(t, fda);
@@ -47,10 +45,7 @@ int transport_recv(struct transport *t, int fd, struct ptp_message *msg)
 int transport_send(struct transport *t, struct fdarray *fda,
 		   enum transport_event event, struct ptp_message *msg)
 {
-	track(msg);
-
-	// little endian to big endian
-	int len = ntohs(msg->header.messageLength); // сетевой порядок расположения байтов положительного короткого целого netshort в узловой порядок расположения байтов.
+	int len = ntohs(msg->header.messageLength);
 
 	return t->send(t, fda, event, 0, msg, len, NULL, &msg->hwts);
 }
@@ -58,8 +53,6 @@ int transport_send(struct transport *t, struct fdarray *fda,
 int transport_peer(struct transport *t, struct fdarray *fda,
 		   enum transport_event event, struct ptp_message *msg)
 {
-	track(msg);
-
 	int len = ntohs(msg->header.messageLength);
 
 	return t->send(t, fda, event, 1, msg, len, NULL, &msg->hwts);

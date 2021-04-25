@@ -18,7 +18,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 #include <errno.h>
-#include <time.h>
 #include <linux/net_tstamp.h>
 #include <linux/sockios.h>
 #include <linux/ethtool.h>
@@ -41,79 +40,39 @@
 
 int sk_tx_timeout = 1;
 int sk_check_fupsync;
-enum hwts_filter_mode sk_hwts_filter_mode = HWTS_FILTER_NORMAL;
 
 /* private methods */
 
-static void init_ifreq(struct ifreq *ifreq, struct hwtstamp_config *cfg,
-	const char *device)
-{
-	memset(ifreq, 0, sizeof(*ifreq));
-	memset(cfg, 0, sizeof(*cfg));
-
-	strncpy(ifreq->ifr_name, device, sizeof(ifreq->ifr_name) - 1);
-
-	ifreq->ifr_data = (void *) cfg;
-}
-
-static int hwts_init(int fd, const char *device, int rx_filter,
-	int rx_filter2, int tx_type)
+static int hwts_init(int fd, const char *device, int rx_filter, int tx_type)
 {
 	struct ifreq ifreq;
-	struct hwtstamp_config cfg;
-	int orig_rx_filter;
+	struct hwtstamp_config cfg, req;
 	int err;
 
-	init_ifreq(&ifreq, &cfg, device);
+	memset(&ifreq, 0, sizeof(ifreq));
+	memset(&cfg, 0, sizeof(cfg));
 
-	switch (sk_hwts_filter_mode) {
-	case HWTS_FILTER_CHECK:
-		err = ioctl(fd, SIOCGHWTSTAMP, &ifreq);
-		if (err < 0) {
-			pr_err("ioctl SIOCGHWTSTAMP failed: %m");
-			return err;
+	strncpy(ifreq.ifr_name, device, sizeof(ifreq.ifr_name) - 1);
+
+	ifreq.ifr_data = (void *) &cfg;
+	cfg.tx_type    = tx_type;
+	cfg.rx_filter  = rx_filter;
+	req = cfg;
+	err = ioctl(fd, SIOCSHWTSTAMP, &ifreq);
+	if (err < 0)
+		return err;
+
+	if (memcmp(&cfg, &req, sizeof(cfg))) {
+
+		pr_debug("driver changed our HWTSTAMP options");
+		pr_debug("tx_type   %d not %d", cfg.tx_type, req.tx_type);
+		pr_debug("rx_filter %d not %d", cfg.rx_filter, req.rx_filter);
+
+		if (cfg.tx_type != req.tx_type ||
+		    (cfg.rx_filter != HWTSTAMP_FILTER_ALL &&
+		     cfg.rx_filter != HWTSTAMP_FILTER_PTP_V2_EVENT)) {
+			return -1;
 		}
-		break;
-	case HWTS_FILTER_FULL:
-		cfg.tx_type   = tx_type;
-		cfg.rx_filter = HWTSTAMP_FILTER_ALL;
-		err = ioctl(fd, SIOCSHWTSTAMP, &ifreq);
-		if (err < 0) {
-			pr_err("ioctl SIOCSHWTSTAMP failed: %m");
-			return err;
-		}
-		break;
-	case HWTS_FILTER_NORMAL:
-		cfg.tx_type   = tx_type;
-		cfg.rx_filter = orig_rx_filter = rx_filter;
-		err = ioctl(fd, SIOCSHWTSTAMP, &ifreq);
-		if (err < 0) {
-			pr_info("driver rejected most general HWTSTAMP filter");
-
-			init_ifreq(&ifreq, &cfg, device);
-			cfg.tx_type   = tx_type;
-			cfg.rx_filter = orig_rx_filter = rx_filter2;
-
-			err = ioctl(fd, SIOCSHWTSTAMP, &ifreq);
-			if (err < 0) {
-				pr_err("ioctl SIOCSHWTSTAMP failed: %m");
-				return err;
-			}
-		}
-		if (cfg.rx_filter == HWTSTAMP_FILTER_SOME)
-			cfg.rx_filter = orig_rx_filter;
-		break;
-	}
-
-	if (cfg.tx_type != tx_type ||
-	    (cfg.rx_filter != rx_filter &&
-	     cfg.rx_filter != rx_filter2 &&
-	     cfg.rx_filter != HWTSTAMP_FILTER_ALL)) {
-		pr_debug("tx_type   %d not %d", cfg.tx_type, tx_type);
-		pr_debug("rx_filter %d not %d or %d", cfg.rx_filter, rx_filter,
-			 rx_filter2);
-		pr_err("The current filter does not match the required");
-		return -1;
 	}
 
 	return 0;
@@ -354,7 +313,7 @@ int sk_receive(int fd, void *buf, int buflen,
 			             "timed out while polling for tx timestamp");
 			pr_err("increasing tx_timestamp_timeout may correct "
 			       "this issue, but it is likely caused by a driver bug");
-			return -errno;
+			return res;
 		} else if (!(pfd.revents & sk_revents)) {
 			pr_err("poll for tx timestamp woke up on non ERR event");
 			return -1;
@@ -362,24 +321,24 @@ int sk_receive(int fd, void *buf, int buflen,
 	}
 
 	cnt = recvmsg(fd, &msg, flags);
-	if (cnt < 0) {
+	if (cnt < 1)
 		pr_err("recvmsg%sfailed: %m",
 		       flags == MSG_ERRQUEUE ? " tx timestamp " : " ");
-	}
+
 	for (cm = CMSG_FIRSTHDR(&msg); cm != NULL; cm = CMSG_NXTHDR(&msg, cm)) {
 		level = cm->cmsg_level;
 		type  = cm->cmsg_type;
 		if (SOL_SOCKET == level && SO_TIMESTAMPING == type) {
 			if (cm->cmsg_len < sizeof(*ts) * 3) {
 				pr_warning("short SO_TIMESTAMPING message");
-				return -EMSGSIZE;
+				return -1;
 			}
 			ts = (struct timespec *) CMSG_DATA(cm);
 		}
 		if (SOL_SOCKET == level && SO_TIMESTAMPNS == type) {
 			if (cm->cmsg_len < sizeof(*sw)) {
 				pr_warning("short SO_TIMESTAMPNS message");
-				return -EMSGSIZE;
+				return -1;
 			}
 			sw = (struct timespec *) CMSG_DATA(cm);
 			hwts->sw = timespec_to_tmv(*sw);
@@ -391,7 +350,7 @@ int sk_receive(int fd, void *buf, int buflen,
 
 	if (!ts) {
 		memset(&hwts->ts, 0, sizeof(hwts->ts));
-		return cnt < 0 ? -errno : cnt;
+		return cnt;
 	}
 
 	switch (hwts->type) {
@@ -407,29 +366,16 @@ int sk_receive(int fd, void *buf, int buflen,
 		hwts->ts = timespec_to_tmv(ts[1]);
 		break;
 	}
-	return cnt < 0 ? -errno : cnt;
+	return cnt;
 }
 
-int sk_set_priority(int fd, int family, uint8_t dscp)
+int sk_set_priority(int fd, uint8_t dscp)
 {
-	int level, optname, tos;
+	int tos;
 	socklen_t tos_len;
 
-	switch (family) {
-	case AF_INET:
-		level = IPPROTO_IP;
-		optname = IP_TOS;
-		break;
-	case AF_INET6:
-		level = IPPROTO_IPV6;
-		optname = IPV6_TCLASS;
-		break;
-	default:
-		return -1;
-	}
-
 	tos_len = sizeof(tos);
-	if (getsockopt(fd, level, optname, &tos, &tos_len) < 0) {
+	if (getsockopt(fd, SOL_IP, IP_TOS, &tos, &tos_len) < 0) {
 		tos = 0;
 	}
 
@@ -439,7 +385,7 @@ int sk_set_priority(int fd, int family, uint8_t dscp)
 	/* set new DSCP value */
 	tos |= dscp<<2;
 	tos_len = sizeof(tos);
-	if (setsockopt(fd, level, optname, &tos, tos_len) < 0) {
+	if (setsockopt(fd, SOL_IP, IP_TOS, &tos, tos_len) < 0) {
 		return -1;
 	}
 
@@ -504,9 +450,15 @@ int sk_timestamping_init(int fd, const char *device, enum timestamp_type type,
 		case TRANS_UDS:
 			return -1;
 		}
-		err = hwts_init(fd, device, filter1, filter2, tx_type);
-		if (err)
-			return err;
+		err = hwts_init(fd, device, filter1, tx_type);
+		if (err) {
+			pr_info("driver rejected most general HWTSTAMP filter");
+			err = hwts_init(fd, device, filter2, tx_type);
+			if (err) {
+				pr_err("ioctl SIOCSHWTSTAMP failed: %m");
+				return err;
+			}
+		}
 	}
 
 	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMPING,

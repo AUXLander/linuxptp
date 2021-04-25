@@ -55,11 +55,6 @@ enum fsm_event {
 	EV_RS_PASSIVE,
 };
 
-enum bmca_select {
-	BMCA_PTP,
-	BMCA_NOOP,
-};
-
 /**
  * Run the state machine for a BC or OC port.
  * @param state  The current state of the port.

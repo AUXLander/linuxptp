@@ -24,16 +24,6 @@
 #include "transport.h"
 
 /**
- * Defines the available Hardware time-stamp setting modes.
- */
-
-enum hwts_filter_mode {
-	HWTS_FILTER_NORMAL,    /* set hardware filters in normal way */
-	HWTS_FILTER_CHECK,     /* check filters but do not change them */
-	HWTS_FILTER_FULL,      /* Use time-stamp on all received packets */
-};
-
-/**
  * Contains timestamping information returned by the GET_TS_INFO ioctl.
  * @valid:            set to non-zero when the info struct contains valid data.
  * @phc_index:        index of the PHC device.
@@ -111,12 +101,11 @@ int sk_receive(int fd, void *buf, int buflen,
 
 /**
  * Set DSCP value for socket.
- * @param fd     An open socket.
- * @param family The address family in use: AF_INET or AF_INET6
- * @param dscp   The desired DSCP code.
+ * @param fd    An open socket.
+ * @param dscp  The desired DSCP code.
  * @return Zero on success, negative on failure
  */
-int sk_set_priority(int fd, int family, uint8_t dscp);
+int sk_set_priority(int fd, uint8_t dscp);
 
 /**
  * Enable time stamping on a given network interface.
@@ -141,10 +130,5 @@ extern int sk_tx_timeout;
  * follow up messages using their network stack receipt time stamps.
  */
 extern int sk_check_fupsync;
-
-/**
- * Hardware time-stamp setting mode
- */
-extern enum hwts_filter_mode sk_hwts_filter_mode;
 
 #endif

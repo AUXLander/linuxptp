@@ -23,11 +23,9 @@
 #ifndef HAVE_MISSING_H
 #define HAVE_MISSING_H
 
-#include <linux/ptp_clock.h>
-#include <linux/version.h>
+#include <time.h>
 #include <sys/syscall.h>
 #include <sys/timex.h>
-#include <time.h>
 #include <unistd.h>
 
 #ifndef ADJ_TAI
@@ -60,121 +58,6 @@ enum _missing_hwtstamp_tx_types {
 enum {
 	HWTSTAMP_TX_ONESTEP_P2P = 3,
 };
-#endif
-
-#ifdef PTP_EXTTS_REQUEST2
-#define PTP_EXTTS_REQUEST_FAILED "PTP_EXTTS_REQUEST2 failed: %m"
-#else
-#define PTP_EXTTS_REQUEST_FAILED "PTP_EXTTS_REQUEST failed: %m"
-#define PTP_EXTTS_REQUEST2 PTP_EXTTS_REQUEST
-#endif
-
-#ifdef PTP_PEROUT_REQUEST2
-#define PTP_PEROUT_REQUEST_FAILED "PTP_PEROUT_REQUEST2 failed: %m"
-#else
-#define PTP_PEROUT_REQUEST_FAILED "PTP_PEROUT_REQUEST failed: %m"
-#define PTP_PEROUT_REQUEST2 PTP_PEROUT_REQUEST
-#endif
-
-#if LINUX_VERSION_CODE < KERNEL_VERSION(5,8,0)
-
-/* from upcoming Linux kernel version 5.8 */
-struct compat_ptp_clock_caps {
-	int max_adj;   /* Maximum frequency adjustment in parts per billon. */
-	int n_alarm;   /* Number of programmable alarms. */
-	int n_ext_ts;  /* Number of external time stamp channels. */
-	int n_per_out; /* Number of programmable periodic signals. */
-	int pps;       /* Whether the clock supports a PPS callback. */
-	int n_pins;    /* Number of input/output pins. */
-	/* Whether the clock supports precise system-device cross timestamps */
-	int cross_timestamping;
-	/* Whether the clock supports adjust phase */
-	int adjust_phase;
-	int rsv[12];   /* Reserved for future use. */
-};
-
-#define ptp_clock_caps compat_ptp_clock_caps
-
-#endif /*LINUX_VERSION_CODE < 5.8*/
-
-#ifndef PTP_MAX_SAMPLES
-#define PTP_MAX_SAMPLES 25 /* Maximum allowed offset measurement samples. */
-#endif /* PTP_MAX_SAMPLES */
-
-#ifndef PTP_SYS_OFFSET
-
-#define PTP_SYS_OFFSET     _IOW(PTP_CLK_MAGIC, 5, struct ptp_sys_offset)
-
-struct ptp_sys_offset {
-	unsigned int n_samples; /* Desired number of measurements. */
-	unsigned int rsv[3];    /* Reserved for future use. */
-	/*
-	 * Array of interleaved system/phc time stamps. The kernel
-	 * will provide 2*n_samples + 1 time stamps, with the last
-	 * one as a system time stamp.
-	 */
-	struct ptp_clock_time ts[2 * PTP_MAX_SAMPLES + 1];
-};
-
-#endif /* PTP_SYS_OFFSET */
-
-#ifndef PTP_SYS_OFFSET_PRECISE
-
-#define PTP_SYS_OFFSET_PRECISE \
-	_IOWR(PTP_CLK_MAGIC, 8, struct ptp_sys_offset_precise)
-
-struct ptp_sys_offset_precise {
-	struct ptp_clock_time device;
-	struct ptp_clock_time sys_realtime;
-	struct ptp_clock_time sys_monoraw;
-	unsigned int rsv[4];    /* Reserved for future use. */
-};
-
-#endif /* PTP_SYS_OFFSET_PRECISE */
-
-#ifndef PTP_SYS_OFFSET_EXTENDED
-
-#define PTP_SYS_OFFSET_EXTENDED \
-	_IOWR(PTP_CLK_MAGIC, 9, struct ptp_sys_offset_extended)
-
-struct ptp_sys_offset_extended {
-	unsigned int n_samples; /* Desired number of measurements. */
-	unsigned int rsv[3];    /* Reserved for future use. */
-	/*
-	 * Array of [system, phc, system] time stamps. The kernel will provide
-	 * 3*n_samples time stamps.
-	 */
-	struct ptp_clock_time ts[PTP_MAX_SAMPLES][3];
-};
-
-#endif /* PTP_SYS_OFFSET_EXTENDED */
-
-#ifndef PTP_PIN_SETFUNC
-
-enum ptp_pin_function {
-	PTP_PF_NONE,
-	PTP_PF_EXTTS,
-	PTP_PF_PEROUT,
-	PTP_PF_PHYSYNC,
-};
-
-struct ptp_pin_desc {
-	char name[64];
-	unsigned int index;
-	unsigned int func;
-	unsigned int chan;
-	unsigned int rsv[5];
-};
-
-#define PTP_PIN_SETFUNC    _IOW(PTP_CLK_MAGIC, 7, struct ptp_pin_desc)
-
-#endif /*!PTP_PIN_SETFUNC*/
-
-#ifdef PTP_PIN_SETFUNC2
-#define PTP_PIN_SETFUNC_FAILED "PTP_PIN_SETFUNC2 failed: %m"
-#else
-#define PTP_PIN_SETFUNC_FAILED "PTP_PIN_SETFUNC failed: %m"
-#define PTP_PIN_SETFUNC2 PTP_PIN_SETFUNC
 #endif
 
 #ifndef LIST_FOREACH_SAFE
@@ -235,22 +118,6 @@ enum {
 #define IFLA_BOND_MAX   (__IFLA_BOND_MAX - 1)
 #endif	/*IFLA_BOND_MAX*/
 
-#ifndef NLA_TYPE_MAX
-enum {
-        NLA_UNSPEC,
-        NLA_U8,
-        NLA_U16,
-        NLA_U32,
-        NLA_U64,
-        NLA_STRING,
-        NLA_FLAG,
-        NLA_MSECS,
-        NLA_NESTED,
-        __NLA_TYPE_MAX,
-};
-#define NLA_TYPE_MAX (__NLA_TYPE_MAX - 1)
-#endif /*NLA_TYPE_MAX*/
-
 #ifdef __UCLIBC__
 
 #if (_XOPEN_SOURCE >= 600 || _POSIX_C_SOURCE >= 200112L) && \
@@ -262,23 +129,12 @@ enum {
 
 #define TFD_TIMER_ABSTIME (1 << 0)
 
-/*
- * clock_nanosleep is supported in uclic-ng since v1.0.31 even without threads.
- */
-#if defined __USE_XOPEN2K && defined __UCLIBC_HAS_ADVANCED_REALTIME__
-
-#include <sys/time.h>
-
-#else
-
 static inline int clock_nanosleep(clockid_t clock_id, int flags,
 				  const struct timespec *request,
 				  struct timespec *remain)
 {
 	return syscall(__NR_clock_nanosleep, clock_id, flags, request, remain);
 }
-
-#endif
 
 static inline int timerfd_create(int clockid, int flags)
 {

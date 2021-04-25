@@ -154,9 +154,9 @@ static int udp_open(struct transport *t, struct interface *iface,
 		    struct fdarray *fda, enum timestamp_type ts_type)
 {
 	struct udp *udp = container_of(t, struct udp, t);
-	const char *name = interface_name(iface);
 	uint8_t event_dscp, general_dscp;
 	int efd, gfd, ttl;
+	char *name = iface->name;
 
 	ttl = config_get_int(t->cfg, name, "udp_ttl");
 	udp->mac.len = 0;
@@ -179,7 +179,7 @@ static int udp_open(struct transport *t, struct interface *iface,
 	if (gfd < 0)
 		goto no_general;
 
-	if (sk_timestamping_init(efd, interface_label(iface), ts_type, TRANS_UDP_IPV4))
+	if (sk_timestamping_init(efd, iface->ts_label, ts_type, TRANS_UDP_IPV4))
 		goto no_timestamping;
 
 	if (sk_general_init(gfd))
@@ -188,10 +188,10 @@ static int udp_open(struct transport *t, struct interface *iface,
 	event_dscp = config_get_int(t->cfg, NULL, "dscp_event");
 	general_dscp = config_get_int(t->cfg, NULL, "dscp_general");
 
-	if (event_dscp && sk_set_priority(efd, AF_INET, event_dscp)) {
+	if (event_dscp && sk_set_priority(efd, event_dscp)) {
 		pr_warning("Failed to set event DSCP priority.");
 	}
-	if (general_dscp && sk_set_priority(gfd, AF_INET, general_dscp)) {
+	if (general_dscp && sk_set_priority(gfd, general_dscp)) {
 		pr_warning("Failed to set general DSCP priority.");
 	}
 
@@ -210,7 +210,7 @@ no_event:
 static int udp_recv(struct transport *t, int fd, void *buf, int buflen,
 		    struct address *addr, struct hw_timestamp *hwts)
 {
-	return sk_receive(fd, buf, buflen, addr, hwts, MSG_DONTWAIT);
+	return sk_receive(fd, buf, buflen, addr, hwts, 0);
 }
 
 static int udp_send(struct transport *t, struct fdarray *fda,
@@ -256,7 +256,7 @@ static int udp_send(struct transport *t, struct fdarray *fda,
 	cnt = sendto(fd, buf, len, 0, &addr->sa, sizeof(addr->sin));
 	if (cnt < 1) {
 		pr_err("sendto failed: %m");
-		return -errno;
+		return cnt;
 	}
 	/*
 	 * Get the time stamp right away.

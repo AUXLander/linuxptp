@@ -100,11 +100,4 @@ struct FaultRecord {
 	struct PTPText   faultDescription;
 };
 
-/* Four bits are dedicated to messageType field */
-#define MAX_MESSAGE_TYPES     16
-struct PortStats {
-	uint64_t rxMsgType[MAX_MESSAGE_TYPES];
-	uint64_t txMsgType[MAX_MESSAGE_TYPES];
-};
-
 #endif

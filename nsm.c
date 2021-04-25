@@ -35,10 +35,6 @@
 #define IFMT		"\n\t\t"
 #define NSM_NFD		3
 
-struct interface {
-	STAILQ_ENTRY(interface) list;
-};
-
 struct nsm {
 	struct config		*cfg;
 	struct fdarray		fda;
@@ -266,17 +262,15 @@ static void nsm_help(FILE *fp)
 static int nsm_open(struct nsm *nsm, struct config *cfg)
 {
 	enum transport_type transport;
-	char ts_label[IF_NAMESIZE];
-	const char *ifname, *name;
 	struct interface *iface;
+	const char *name;
 	int count = 0;
 
 	STAILQ_FOREACH(iface, &cfg->interfaces, list) {
-		ifname = interface_name(iface);
-		memset(ts_label, 0, sizeof(ts_label));
-		rtnl_get_ts_device(ifname, ts_label);
-		interface_set_label(iface, ts_label);
-		interface_ensure_tslabel(iface);
+		rtnl_get_ts_device(iface->name, iface->ts_label);
+		if (iface->ts_label[0] == '\0') {
+			strncpy(iface->ts_label, iface->name, MAX_IFNAME_SIZE);
+		}
 		count++;
 	}
 	if (count != 1) {
@@ -284,7 +278,7 @@ static int nsm_open(struct nsm *nsm, struct config *cfg)
 		return -1;
 	}
 	iface = STAILQ_FIRST(&cfg->interfaces);
-	nsm->name = name = interface_name(iface);
+	nsm->name = name = iface->name;
 	nsm->cfg = cfg;
 
 	transport = config_get_int(cfg, name, "network_transport");
