@@ -28,6 +28,8 @@ struct filter {
 	tmv_t (*sample)(struct filter *filter, tmv_t sample);
 
 	void (*reset)(struct filter *filter);
+
+	void (*update)(struct filter *filter, tmv_t offset);
 };
 
 #endif

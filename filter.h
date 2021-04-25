@@ -31,6 +31,7 @@ struct filter;
 enum filter_type {
 	FILTER_MOVING_AVERAGE,
 	FILTER_MOVING_MEDIAN,
+	FILTER_MOVING_KALMAN
 };
 
 /**
@@ -60,5 +61,13 @@ tmv_t filter_sample(struct filter *filter, tmv_t sample);
  * @param filter   Pointer to a filter obtained via @ref filter_create().
  */
 void filter_reset(struct filter *filter);
+
+/**
+ * Reset a filter.
+ * @param filter   Pointer to a filter obtained via @ref filter_create().
+ * @param offset   Calculated offset: offset = t2 - t1 - delay.
+ * @return offset parameter's value.
+ */
+tmv_t filter_update(struct filter *filter, tmv_t offset);
 
 #endif

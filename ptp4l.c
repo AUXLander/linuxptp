@@ -35,6 +35,19 @@
 #include "uds.h"
 #include "util.h"
 #include "version.h"
+#include "filter.h"
+
+#include "timestamper.h"
+
+extern int noiseEnable;
+extern enum noise_type noise;
+
+extern double sigmaV;
+extern double sigmaW;
+
+const char* fltr_mave = "MAVE";
+const char* fltr_median = "MEDIAN";
+const char* fltr_kalman = "KALMAN";
 
 static void usage(char *progname)
 {
@@ -64,9 +77,14 @@ static void usage(char *progname)
 		" -m        print messages to stdout\n"
 		" -q        do not print messages to the syslog\n"
 		" -v        prints the software version and exits\n"
-		" -h        prints this message and exits\n"
+		" -h        prints this message and exits\n\n"
+		" Simulations\n\n"
+		" -n [type]   sets type of noise: 1 -> uniform, 2 -> poisson, 3 -> normal\n"
+		" -W [sigma]  Sigma of process noise \n"
+		" -V [sigma]  Sigma of measurement noise \n"
+		" -F [filter] set one of avaible filters: %s, %s, %s\n"
 		"\n",
-		progname);
+		progname, fltr_mave, fltr_median, fltr_kalman);
 }
 
 int main(int argc, char *argv[])
@@ -86,11 +104,12 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	opts = config_long_options(cfg);
+	long argument;
 
 	/* Process the command line arguments. */
 	progname = strrchr(argv[0], '/');
 	progname = progname ? 1+progname : argv[0];
-	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvh",
+	while (EOF != (c = getopt_long(argc, argv, "AEP246HSLf:i:p:sl:mqvhn:W:V:F:",
 				       opts, &index))) {
 		switch (c) {
 		case 0:
@@ -172,6 +191,51 @@ int main(int argc, char *argv[])
 		case '?':
 			usage(progname);
 			goto out;
+		case 'n':
+			argument = strtol(optarg, NULL, 10);
+
+			if (argument > 0 && argument < 4)
+			{
+				fprintf(stderr, "noise enable\n");
+				noiseEnable = 1;
+				noise = (enum noise_type)argument;
+			}
+			break;
+
+		case 'W':
+			sigmaW = strtod(optarg, NULL);
+			fprintf(stderr, "sigmaW: %lf\n", sigmaW);
+			break;
+			
+		case 'V':
+			sigmaV = strtod(optarg, NULL);
+			fprintf(stderr, "sigmaV: %lf\n", sigmaV);
+			break;
+
+		case 'F':
+			if (strcmp(optarg, fltr_mave) == 0)
+			{
+				config_set_int(cfg, "delay_filter", FILTER_MOVING_AVERAGE);
+				fprintf(stderr, "Selected filter: %s\n", fltr_mave);
+			}
+			else if (strcmp(optarg, fltr_median) == 0)
+			{
+				config_set_int(cfg, "delay_filter", FILTER_MOVING_MEDIAN);
+				fprintf(stderr, "Selected filter: %s\n", fltr_median);
+			}
+			else if (strcmp(optarg, fltr_kalman) == 0)
+			{
+				config_set_int(cfg, "delay_filter", FILTER_MOVING_KALMAN);
+				fprintf(stderr, "Selected filter: %s\n", fltr_kalman);
+			}
+			else
+			{
+				fprintf(stderr, "Unknown filter selected!\n");
+				goto out;
+			}
+
+			break;
+
 		default:
 			usage(progname);
 			goto out;

@@ -85,6 +85,8 @@ static void mmedian_reset(struct filter *filter)
 
 struct filter *mmedian_create(int length)
 {
+	pr_notice("Median filter start!");
+	
 	struct mmedian *m;
 
 	if (length < 1)

@@ -64,6 +64,8 @@ static void mave_reset(struct filter *filter)
 
 struct filter *mave_create(int length)
 {
+	pr_notice("Mave filter start!");
+
 	struct mave *m;
 	m = calloc(1, sizeof(*m));
 	if (!m) {

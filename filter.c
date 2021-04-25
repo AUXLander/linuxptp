@@ -20,6 +20,7 @@
 #include "filter_private.h"
 #include "mave.h"
 #include "mmedian.h"
+#include "kalman.h"
 
 struct filter *filter_create(enum filter_type type, int length)
 {
@@ -28,6 +29,8 @@ struct filter *filter_create(enum filter_type type, int length)
 		return mave_create(length);
 	case FILTER_MOVING_MEDIAN:
 		return mmedian_create(length);
+	case FILTER_MOVING_KALMAN:
+		return kalman_create();
 	default:
 		return NULL;
 	}
@@ -36,6 +39,16 @@ struct filter *filter_create(enum filter_type type, int length)
 void filter_destroy(struct filter *filter)
 {
 	filter->destroy(filter);
+}
+
+tmv_t filter_update(struct filter *filter, tmv_t offset)
+{
+	if (filter->update != NULL)
+	{
+		filter->update(filter, offset);
+	}
+
+	return offset;
 }
 
 tmv_t filter_sample(struct filter *filter, tmv_t sample)
