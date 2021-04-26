@@ -122,7 +122,7 @@ struct filter *kalman_create()
 
     c->index = 0;
 
-    c->X = 1;
+    c->X = dbl_tmv(1.0);
 
 	return &c->filter;
 }
