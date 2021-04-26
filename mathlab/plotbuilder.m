@@ -1,29 +1,39 @@
-filePath = '../test/kalman_v2.5_w1.mtx'; sigmaV = 2.5; sigmaW = 1;
+% filePath = '../test/kalman_v2.5_w1.mtx'; sigmaV = 2.5; sigmaW = 1;
 % filePath = '../test/kalman_v2.5_w2.5.mtx'; sigmaV = 2.5; sigmaW = 2.5;
 % filePath = '../test/kalman_v5_w1.mtx'; sigmaV = 5; sigmaW = 1;
-% filePath = '../test/kalman_v5_w5.mtx'; sigmaV = 5; sigmaW = 5;
-filePath = '../test/kalman_v7.5_w7.5.mtx'; sigmaV = 7.5; sigmaW = 7.5;
+filePath = '../test/kalman_v5_w5.mtx'; sigmaV = 5; sigmaW = 5;
+% filePath = '../test/kalman_v7.5_w7.5.mtx'; sigmaV = 7.5; sigmaW = 7.5;
 % filePath = '../test/kalman_v10_w5.mtx'; sigmaV = 10; sigmaW = 5;
 % filePath = '../test/kalman_v10_w10.mtx'; sigmaV = 10; sigmaW = 10;
 % filePath = '../test/kalman_v15_w5.mtx'; sigmaV = 15; sigmaW = 5;
 % filePath = '../test/kalman_v15_w10.mtx'; sigmaV = 15; sigmaW = 10;
 % filePath = '../test/kalman_v30_w25.mtx'; sigmaV = 30; sigmaW = 25;
 
+%n = 1
+% filePath = '../test/kalman_n1_v14.4338_w3.mtx'; sigmaV = 14.4338; sigmaW = 3;
+
+%n = 3
+% filePath = '../test/kalman_n3_v14.4338_w3.mtx'; sigmaV = 14.4338; sigmaW = 3;
+% filePath = '../test/kalman_n3_v14.4338_w7.mtx'; sigmaV = 14.4338; sigmaW = 7;
+filePath = '../test/kalman_n3_v14.4338_w13.mtx'; sigmaV = 14.4338; sigmaW = 13;
+
 kalman_001 = readmatrix(filePath, 'FileType','text');
+kalman_001 = kalman_001(15:641,:);
 
-kalman_001 = kalman_001(55:1050,:);
+%n = 1
+% filePath = '../test/median_n1.mtx';
 
-filePath = '../test/median.mtx';
+%n = 3
+filePath = '../test/median_n3.mtx';
+
 median_def = readmatrix(filePath, 'FileType','text');
-
-median_def = median_def(55:1050,:);
+median_def = median_def(15:1250,:);
 
 title(strcat('sigmaV: ', num2str(sigmaV), ';  sigmaW: ', num2str(sigmaW)), 'FontSize',12);
 
 hold on
 plot(median_def(:,1),median_def(:,2), 'Color', 'b');
 plot(kalman_001(:,1),kalman_001(:,2), 'Color', 'r');
-% plot(calman_002(:,1),calman_002(:,2), 'Color', 'b');
 hold off
 
 MM = strcat('Median: M = ', num2str(M(median_def(:,2)),'% 10.2f'), ' D = ', num2str(D(median_def(:,2)),'% 10.2f'));

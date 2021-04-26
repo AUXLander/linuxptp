@@ -8,6 +8,8 @@ struct kalman
 
     tmv_t  Q;
 
+    tmv_t  X;
+
     tmv_t  bX;
     double bP;
 
@@ -22,7 +24,14 @@ double sigmaW = 10;
 
 static double matrixA(tmv_t Q, tmv_t X)
 {
-    return 1.0 + tmv_dbl(Q) / tmv_dbl(X);
+    if (tmv_dbl(X) != 0.0)
+    {
+        return 1.0 + tmv_dbl(Q) / tmv_dbl(X);
+    }
+    else
+    {
+        return 1.0;
+    }
 }
 
 static void kalman_update(struct filter *filter, tmv_t offset)
@@ -50,7 +59,7 @@ static tmv_t kalman_sample(struct filter *filter, tmv_t Y)
     }
     else
     {
-        const double A = c->A(c->Q, c->aX);
+        const double A = c->A(c->Q, c->X);
 
         // A * aX;
         const tmv_t  bX = dbl_tmv(tmv_dbl(c->aX) * A);
@@ -68,6 +77,8 @@ static tmv_t kalman_sample(struct filter *filter, tmv_t Y)
         c->aX = aX;
         c->aP = aP;
     }
+
+    c->X = Y;
 
     c->index = c->index + 1;
     
@@ -110,6 +121,8 @@ struct filter *kalman_create()
     c->A = matrixA;
 
     c->index = 0;
+
+    c->X = 1;
 
 	return &c->filter;
 }
