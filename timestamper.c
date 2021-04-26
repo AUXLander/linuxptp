@@ -6,9 +6,8 @@
 extern int noiseEnable;
 extern enum noise_type noise;
 
-extern uint64_t uniform_next();
-extern uint64_t poisson_next();
-extern uint64_t  normal_next();
+extern int64_t uniform_next();
+extern int64_t  normal_next();
 
 void track(struct ptp_message *msg)
 {
@@ -37,7 +36,7 @@ void track(struct ptp_message *msg)
 			addr = &msg->pdelay_resp.requestReceiptTimestamp;
 			break;
 		case FOLLOW_UP:
-			addr = &msg->follow_up.preciseOriginTimestamp;
+			addr = &msg->follow_up.preciseOriginTimestamp;	
 			break;
 		case DELAY_RESP:
 			addr = &msg->delay_resp.receiveTimestamp;
@@ -67,21 +66,20 @@ void track(struct ptp_message *msg)
 				case uniform_noise:
 				{
 					seconds_lsb += 0;
-					nanoseconds += uniform_next();
-				}; 
-				break;
-				
-				case poisson_noise:
-				{
-					seconds_lsb += 0;
-					nanoseconds += poisson_next();
+
+					const int64_t nans = (int64_t)nanoseconds - uniform_next();
+					
+					nanoseconds = nans < 0 ? 0 : (uint32_t)nans;
 				}; 
 				break;
 				
 				case normal_noise:
 				{
 					seconds_lsb += 0;
-					nanoseconds += normal_next();
+
+					const int64_t nans = (int64_t)nanoseconds - normal_next();
+					
+					nanoseconds = nans < 0 ? 0 : (uint32_t)nans;
 				}; 
 				break;
 

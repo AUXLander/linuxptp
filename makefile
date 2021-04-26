@@ -7,6 +7,7 @@ LIB_SUBDIR = /randvardistribution/src/
 LIB_PATH = $(ROOT_DIR)$(LIB_SUBDIR)$(LIB_NAME)
 
 LIB_INSTALL_PATH = /usr/lib/
+LIB_INSTALL_PATH64 = /usr/lib64/
 
 CC = $(CROSS_COMPILE)gcc
 CFLAGS = -O3 $(incdefs)
@@ -32,8 +33,10 @@ subsystem:
 	$(MAKE) -C $(ROOT_DIR)$(LIB_SUBDIR)
 
 install:
-	sudo rm -f $(LIB_INSTALL_PATH)$(LIB_NAME)
-	sudo cp -f $(LIB_PATH) $(LIB_INSTALL_PATH)
+	if [ -d "$(LIB_INSTALL_PATH)" ]; 	then sudo rm -f $(LIB_INSTALL_PATH)$(LIB_NAME);		fi
+	if [ -d "$(LIB_INSTALL_PATH)" ]; 	then sudo cp -f $(LIB_PATH) $(LIB_INSTALL_PATH);	fi
+	if [ -d "$(LIB_INSTALL_PATH64)" ]; 	then sudo rm -f $(LIB_INSTALL_PATH64)$(LIB_NAME);	fi
+	if [ -d "$(LIB_INSTALL_PATH64)" ]; 	then sudo cp -f $(LIB_PATH) $(LIB_INSTALL_PATH64); 	fi
 
 ptp4l: ptp4l.o $(OBJ) 
 	gcc $(OBJ) $(LDLIBS) -o ptp4l ptp4l.o $(LIB_NAME)

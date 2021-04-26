@@ -79,7 +79,7 @@ static void usage(char *progname)
 		" -v        prints the software version and exits\n"
 		" -h        prints this message and exits\n\n"
 		" Simulations\n\n"
-		" -n [type]   sets type of noise: 1 -> uniform, 2 -> poisson, 3 -> normal\n"
+		" -n [type]   sets type of noise: 1 -> uniform, 2 -> , 3 -> normal\n"
 		" -W [sigma]  Sigma of process noise \n"
 		" -V [sigma]  Sigma of measurement noise \n"
 		" -F [filter] set one of avaible filters: %s, %s, %s\n"
