@@ -21,10 +21,13 @@ filePath = '../test/kalman_v5_w5.mtx'; sigmaV = 5; sigmaW = 5;
 % filePath = '../test/kalman_n3_v14.4338_w28.mtx'; sigmaV = 14.4338; sigmaW = 28; % успех
 % filePath = '../test/kalman_n3_v14.4338_w50.mtx'; sigmaV = 14.4338; sigmaW = 50; % успех
 % filePath = '../test/kalman_n3_v14.4338_w60.mtx'; sigmaV = 14.4338; sigmaW = 60; % успех
-filePath = '../test/kalman_n3_v16_w80.mtx'; sigmaV = 16; sigmaW = 80; % успех
+% filePath = '../test/kalman_n3_v16_w80.mtx'; sigmaV = 16; sigmaW = 80; % успех
+% filePath = '../test/kalman_n3_v28_w160.mtx'; sigmaV = 28; sigmaW = 160; % успех
+% filePath = '../test/kalman_n3_v28_w160_2.mtx'; sigmaV = 28; sigmaW = 160; % успех
+filePath = '../test/kalman_n3_v28_w160_3.mtx'; sigmaV = 28; sigmaW = 160; % успех
 
 kalman_001 = readmatrix(filePath, 'FileType','text');
-kalman_001 = kalman_001(100:1200,:);
+kalman_001 = kalman_001(15:1000,:);
 
 %n = 1
 % filePath = '../test/median_n1.mtx';
