@@ -29,7 +29,7 @@ struct filter {
 
 	void (*reset)(struct filter *filter);
 
-	void (*update)(struct filter *filter, tmv_t offset);
+	tmv_t (*update)(struct filter *filter, tmv_t offset);
 };
 
 #endif

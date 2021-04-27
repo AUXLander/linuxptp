@@ -16,10 +16,15 @@ filePath = '../test/kalman_v5_w5.mtx'; sigmaV = 5; sigmaW = 5;
 % filePath = '../test/kalman_n3_v14.4338_w3.mtx'; sigmaV = 14.4338; sigmaW = 3;
 % filePath = '../test/kalman_n3_v14.4338_w7.mtx'; sigmaV = 14.4338; sigmaW = 7;
 %filePath = '../test/kalman_n3_v14.4338_w13.mtx'; sigmaV = 14.4338; sigmaW = 13;
-filePath = '../test/kalman_n3_v14.4338_w17.mtx'; sigmaV = 14.4338; sigmaW = 17;
+% filePath = '../test/kalman_n3_v14.4338_w14.mtx'; sigmaV = 14.4338; sigmaW = 14;
+% filePath = '../test/kalman_n3_v14.4338_w17.mtx'; sigmaV = 14.4338; sigmaW = 17;
+% filePath = '../test/kalman_n3_v14.4338_w28.mtx'; sigmaV = 14.4338; sigmaW = 28; % успех
+% filePath = '../test/kalman_n3_v14.4338_w50.mtx'; sigmaV = 14.4338; sigmaW = 50; % успех
+% filePath = '../test/kalman_n3_v14.4338_w60.mtx'; sigmaV = 14.4338; sigmaW = 60; % успех
+filePath = '../test/kalman_n3_v16_w80.mtx'; sigmaV = 16; sigmaW = 80; % успех
 
 kalman_001 = readmatrix(filePath, 'FileType','text');
-kalman_001 = kalman_001(15:1240,:);
+kalman_001 = kalman_001(100:1200,:);
 
 %n = 1
 % filePath = '../test/median_n1.mtx';

@@ -45,7 +45,7 @@ tmv_t filter_update(struct filter *filter, tmv_t offset)
 {
 	if (filter->update != NULL)
 	{
-		filter->update(filter, offset);
+		return filter->update(filter, offset);
 	}
 
 	return offset;
