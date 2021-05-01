@@ -36,7 +36,7 @@ kalman_001 = kalman_001(15:1000,:);
 filePath = '../test/median_n3.mtx';
 
 median_def = readmatrix(filePath, 'FileType','text');
-median_def = median_def(15:1250,:);
+median_def = median_def(15:1000,:);
 
 title(strcat('sigmaV: ', num2str(sigmaV), ';  sigmaW: ', num2str(sigmaW)), 'FontSize',12);
 

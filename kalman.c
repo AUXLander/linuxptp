@@ -15,11 +15,11 @@ struct kalman
 
     tmv_t  aX;
     double aP;
-    
-    uint64_t index;
 
     double sV;
     double sW;
+    
+    uint64_t index;
 
     struct filter *update_filter;
 };
@@ -39,6 +39,13 @@ static double matrixA(tmv_t Q, tmv_t X)
     }
 }
 
+static tmv_t kalman_update_local(struct filter *filter, tmv_t offset)
+{
+    struct kalman *c = container_of(filter, struct kalman, filter);
+
+    return c->Q = offset;
+}
+
 static tmv_t kalman_update(struct filter *filter, tmv_t offset)
 {
     struct kalman *c = container_of(filter, struct kalman, filter);
@@ -47,6 +54,8 @@ static tmv_t kalman_update(struct filter *filter, tmv_t offset)
 
     if (c->update_filter != NULL)
     {
+        c->update_filter->update(c->update_filter, c->aX);
+
         return c->update_filter->sample(c->update_filter, offset);
     }
 
@@ -127,7 +136,7 @@ struct filter *kalman_local(double sV, double sW)
 	c->filter.destroy = kalman_destroy;
 	c->filter.sample  = kalman_sample;
 	c->filter.reset   = kalman_reset;
-    c->filter.update  = kalman_update;
+    c->filter.update  = kalman_update_local;
 
     c->Q = nanoseconds_to_tmv(0);
     c->A = matrixA;
@@ -160,7 +169,7 @@ struct filter *kalman_create()
 	c->filter.reset   = kalman_reset;
     c->filter.update  = kalman_update;
 
-    c->update_filter = kalman_local(14.4338, 5);
+    c->update_filter = kalman_local(14.4338, 50);
 
     c->Q = nanoseconds_to_tmv(0);
     c->A = matrixA;
