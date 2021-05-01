@@ -15,8 +15,13 @@ struct kalman
 
     tmv_t  aX;
     double aP;
+
+    double sV;
+    double sW;
     
     uint64_t index;
+
+    struct filter *update_filter;
 };
 
 double sigmaV = 30;
@@ -34,19 +39,35 @@ static double matrixA(tmv_t Q, tmv_t X)
     }
 }
 
-static void kalman_update(struct filter *filter, tmv_t offset)
+static tmv_t kalman_update_local(struct filter *filter, tmv_t offset)
+{
+    struct kalman *c = container_of(filter, struct kalman, filter);
+
+    return c->Q = offset;
+}
+
+static tmv_t kalman_update(struct filter *filter, tmv_t offset)
 {
     struct kalman *c = container_of(filter, struct kalman, filter);
 
     c->Q = offset;
+
+    if (c->update_filter != NULL)
+    {
+        c->update_filter->update(c->update_filter, c->aX);
+
+        return c->update_filter->sample(c->update_filter, offset);
+    }
+
+    return offset;
 }
 
 static tmv_t kalman_sample(struct filter *filter, tmv_t Y)
 {
     struct kalman *c = container_of(filter, struct kalman, filter);
 
-    const double M_Vk = sigmaV * sigmaV;
-    const double M_Wk = sigmaW * sigmaW;
+    const double M_Vk = c->sV * c->sV;
+    const double M_Wk = c->sW * c->sW;
     
     const double M_1_Wk = 1.0 / M_Wk;
 
@@ -99,6 +120,37 @@ static void kalman_reset(struct filter *filter)
     m->index = 0;
 }
 
+struct filter *kalman_local(double sV, double sW)
+{
+	pr_notice("Kalman filter start!");
+
+    struct kalman *c;
+
+	c = calloc(1, sizeof(*c));
+
+	if (!c)
+    {
+        return NULL;
+    }
+
+	c->filter.destroy = kalman_destroy;
+	c->filter.sample  = kalman_sample;
+	c->filter.reset   = kalman_reset;
+    c->filter.update  = kalman_update_local;
+
+    c->Q = nanoseconds_to_tmv(0);
+    c->A = matrixA;
+
+    c->index = 0;
+
+    c->X = dbl_tmv(1.0);
+
+    c->sV = sV;
+    c->sW = sW;
+
+	return &c->filter;
+}
+
 struct filter *kalman_create()
 {
 	pr_notice("Kalman filter start!");
@@ -117,12 +169,17 @@ struct filter *kalman_create()
 	c->filter.reset   = kalman_reset;
     c->filter.update  = kalman_update;
 
+    c->update_filter = kalman_local(14.4338, 50);
+
     c->Q = nanoseconds_to_tmv(0);
     c->A = matrixA;
 
     c->index = 0;
 
     c->X = dbl_tmv(1.0);
+
+    c->sV = sigmaV;
+    c->sW = sigmaW;
 
 	return &c->filter;
 }
