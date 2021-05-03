@@ -26,8 +26,10 @@ filePath = '../test/kalman_v5_w5.mtx'; sigmaV = 5; sigmaW = 5;
 % filePath = '../test/kalman_n3_v28_w160_2.mtx'; sigmaV = 28; sigmaW = 160; % успех
 filePath = '../test/kalman_n3_v28_w160_3.mtx'; sigmaV = 28; sigmaW = 160; % успех
 
+filePath = '../test/kalman_n3_v14.4338_w160_.mtx'; sigmaV = 14.4338; sigmaW = 160; % успех
+
 kalman_001 = readmatrix(filePath, 'FileType','text');
-kalman_001 = kalman_001(15:1000,:);
+kalman_001 = kalman_001(15:900,:);
 
 %n = 1
 % filePath = '../test/median_n1.mtx';
@@ -35,8 +37,13 @@ kalman_001 = kalman_001(15:1000,:);
 %n = 3
 filePath = '../test/median_n3.mtx';
 
+%n = 3 __
+
+filePath = '../test/median_n3__.mtx';
+
+
 median_def = readmatrix(filePath, 'FileType','text');
-median_def = median_def(15:1000,:);
+median_def = median_def(15:900,:);
 
 title(strcat('sigmaV: ', num2str(sigmaV), ';  sigmaW: ', num2str(sigmaW)), 'FontSize',12);
 
