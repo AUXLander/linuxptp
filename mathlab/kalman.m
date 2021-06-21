@@ -2,8 +2,8 @@ clear all;
 
 N = 1000;
 
-sigmaV = 10.5;
-sigmaW = 10.5;
+sigmaV = 50.5;
+sigmaW = 100.5;
 
 X = zeros(1,N);
 Y = zeros(1,N);
@@ -18,7 +18,7 @@ aP = zeros(1,N);
 C = 1.0;
 
 X(1) = 1;
-Q(1) = 100;
+Q(1) = 10;
 aP(1) = 0.1;
 aX(1) = X(1);
 
@@ -33,14 +33,17 @@ for k = 1:N-1
     Q(k+1) = Q(k) * 0.8;
     
     % filtering
-    Vk = sigmaV^2;
-    Wk = sigmaW^2;
+    Vk = sigmaV;
+    Wk = sigmaW;
     
     bX(k+1) = A*aX(k);
     bP(k+1) = A*aP(k)*A + Vk;
     
     aX(k+1) = bX(k+1) + (1.0/((1.0/bP(k+1)) + C*(1.0/Wk)*C))*C*(1.0/Wk)*(Y(k+1) - C*bX(k+1));
     aP(k+1) = ( (1.0/bP(k+1)) + C*(1.0/Wk)*C );
+    
+%     aX(k+1) = bX(k+1) + C * (Y(k+1) - C*bX(k+1)) / (Wk * (1.0/bP(k+1)) + C * C);
+%     aP(k+1) = Wk / (Wk * (1.0/bP(k+1)) + C * C);
     
 end
 

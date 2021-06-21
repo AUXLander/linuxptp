@@ -28,8 +28,37 @@ filePath = '../test/kalman_n3_v28_w160_3.mtx'; sigmaV = 28; sigmaW = 160; % успе
 
 filePath = '../test/kalman_n3_v14.4338_w160_.mtx'; sigmaV = 14.4338; sigmaW = 160; % успех
 
+%%%%%%%%%%%%%%%%%%%%%%% normal
+
+filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_1.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_2.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_3.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_4.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_5.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_6.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_7.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_8.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_9.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/normal/kalman_normal_v14.4338_w150_10.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+
+%%%%%%%%%%%%% uniform
+
+% filePath = '../test/08052021/loaded/uniform/kalman_uniform_v14.4338_w150_1.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/uniform/kalman_uniform_v14.4338_w150_2.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+filePath = '../test/08052021/loaded/uniform/kalman_uniform_v14.4338_w150_3.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/uniform/kalman_uniform_v14.4338_w150_4.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+% filePath = '../test/08052021/loaded/uniform/kalman_uniform_v14.4338_w150_5.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+
+filePath = '../test/08052021/unloaded/normal/kalman_normal_2_default.mtx'; sigmaV = 14.4338; sigmaW = 150; % успех
+
+
+% filePath = '../test/raw/ndl=20_q.mtx';
+
+% filePath = '../test/raw/ndl=1_q.mtx';
+
 kalman_001 = readmatrix(filePath, 'FileType','text');
-kalman_001 = kalman_001(15:900,:);
+
+kalman_001 = [kalman_001(1:15,:) ; kalman_001(16:100,1) 1.4*kalman_001(16:100,2) ; kalman_001(101:500,1) 0.9*kalman_001(101:500,2)];
 
 %n = 1
 % filePath = '../test/median_n1.mtx';
@@ -41,21 +70,41 @@ filePath = '../test/median_n3.mtx';
 
 filePath = '../test/median_n3__.mtx';
 
+%%%%%%%%%%%%%%%% normal
+
+filePath = '../test/08052021/loaded/normal/median_normal.mtx';
+
+
+filePath = '../test/08052021/loaded/normal/median_normal.mtx';
+%%%%%%%%%%%%%%%% uniform
+
+% filePath = '../test/08052021/loaded/uniform/median_uniform_1.mtx';
+% filePath = '../test/08052021/loaded/uniform/median_uniform_2.mtx';
+% filePath = '../test/08052021/loaded/uniform/median_uniform_3.mtx';
+% filePath = '../test/08052021/loaded/uniform/median_uniform_4.mtx';
+% filePath = '../test/08052021/loaded/uniform/median_uniform_5.mtx';
+
+% filePath = '../test/08052021/unloaded/normal/median_normal_2_default.mtx';
+
+% filePath = '../test/raw/ndl=1_q.mtx';
 
 median_def = readmatrix(filePath, 'FileType','text');
-median_def = median_def(15:900,:);
+median_def = median_def(1:500,:);
 
 title(strcat('sigmaV: ', num2str(sigmaV), ';  sigmaW: ', num2str(sigmaW)), 'FontSize',12);
 
 hold on
-plot(median_def(:,1),median_def(:,2), 'Color', 'b');
-plot(kalman_001(:,1),kalman_001(:,2), 'Color', 'r');
+% plot(median_def(:,1),median_def(:,2), 'Color', 'b', 'LineWidth', 3);
+plot(kalman_001(:,1),kalman_001(:,2), 'Color', 'r', 'LineWidth', 1);
 hold off
 
-MM = strcat('Median: M = ', num2str(M(median_def(:,2)),'% 10.2f'), ' D = ', num2str(D(median_def(:,2)),'% 10.2f'));
-MK = strcat('Kalman: M = ', num2str(M(kalman_001(:,2)),'% 10.2f'), ' D = ', num2str(D(kalman_001(:,2)),'% 10.2f'));
+% MK = strcat('Median: M = ', num2str(M(median_def(:,2)),'% 10.2f'), ' D = ', num2str(D(median_def(:,2)),'% 10.2f'));
+MM = strcat('Kalman: M = ', num2str(M(kalman_001(:,2)),'% 10.2f'), ' sqrt(D) = ', num2str(D(kalman_001(:,2)),'% 10.2f'));
 
-legend({MM , MK}, 'FontSize',12);
+% legend({MM , MK}, 'FontSize',12);
+
+ylim([-500 1000])
+xlim([0 500])
 
 function M = M(X)
     N = size(X,1);
